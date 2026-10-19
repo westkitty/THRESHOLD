@@ -1,0 +1,2 @@
+# The source questionnaire is immutable, including intentional trailing spaces.
+PROMPT.md whitespace=-blank-at-eol

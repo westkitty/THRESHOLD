@@ -1,0 +1,9 @@
+# Local secrets, participant responses and private exports
+.DS_Store
+.env
+.env.*
+responses/
+answers/
+*answers*.txt
+*answers*.json
+*.personal.json
