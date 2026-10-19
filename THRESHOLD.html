@@ -191,6 +191,43 @@ dialog::backdrop{background:rgba(0,0,0,.83);backdrop-filter:blur(8px)}
 @media(max-width:365px){.cover-title{font-size:71px}.logo-type{font-size:13px}.save-toggle{max-width:123px}.rail-round{min-width:128px}.question-actions .btn{font-size:9px}.response-header span{display:none}}
 @media(max-width:800px){.workbench{grid-template-columns:minmax(0,1fr);width:100%}.rail{min-width:0;max-width:100%;overflow:hidden}.rail-sticky,.rail-rounds{min-width:0;max-width:100%}.rail-rounds{width:100%}.question-stage,.question-body{min-width:0;max-width:100%}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}.stage-enter{filter:none!important;transform:none!important}}
+
+/* Session controls and restore utilities */
+.session-toggle{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:36px;padding:9px 12px;border:1px solid var(--rim);background:rgba(68,7,26,.45);color:#f0b4c4;font:700 10px var(--mono);letter-spacing:.13em;transition:background .2s,border-color .2s}
+.session-toggle:hover{background:var(--scar);border-color:var(--hot)}
+.session-toggle .session-glyph{color:var(--hot);font-size:17px;line-height:0}
+.session-body{padding:28px;max-height:min(86dvh,840px);overflow-y:auto;overscroll-behavior:contain}
+.session-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.session-head h2{font:800 clamp(40px,7vw,68px)/.9 var(--display);margin:15px 0 22px;letter-spacing:-.02em}
+.session-numbers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 25px}
+.session-number{background:#1d0b14;border-left:2px solid #a7193f;padding:15px 12px}
+.session-number b{display:block;font:800 36px var(--display);color:#fff}
+.session-number span{font:10px var(--mono);letter-spacing:.05em;color:#b18c98}
+.session-round{margin-top:14px;border-top:1px solid var(--white-rim);padding:12px 0 0}
+.session-round-label{display:flex;justify-content:space-between;color:#dda5b6;font:10px var(--mono);letter-spacing:.09em;margin-bottom:10px}
+.session-questions{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px}
+.session-jump{min-height:38px;background:#1c1016;border:1px solid #43202c;color:#ab8c97;font:12px var(--mono)}
+.session-jump:hover,.session-jump:focus-visible{border-color:var(--hot);color:#fff}
+.session-jump.answered{background:#4d1224;border-color:#9f3150;color:#fff}
+.session-actions{display:flex;flex-wrap:wrap;gap:9px;padding-top:24px}
+.session-actions .btn{flex:1 1 140px;justify-content:center}
+.import-drop{border:1px dashed #b34567;background:#210913;padding:18px;margin:20px 0 11px}
+.import-drop label{display:block;color:#f4c5d2;font:12px var(--mono);letter-spacing:.09em;margin-bottom:11px}
+.import-drop input{width:100%;max-width:100%;color:#f4d4df;font:12px var(--mono)}
+.import-details{padding:15px;border-left:3px solid #ff2453;background:#270a15;font:12px/1.7 var(--mono);color:#eac9d3}
+.import-details[hidden]{display:none}
+.import-state{color:#b996a3;font:12px/1.6 var(--mono);min-height:28px}
+.review-signal{margin:15px 0 30px;padding:20px;border:1px solid var(--rim);background:linear-gradient(130deg,#280b17,#0e080c);display:flex;align-items:center;gap:20px;justify-content:space-between;flex-wrap:wrap}
+.review-signal h2{margin:0 0 7px;font:800 33px var(--display)}
+.review-signal p{margin:0;color:#bd97a4;font:11px/1.6 var(--mono)}
+.review-filter{display:flex;gap:8px;flex-wrap:wrap}
+.review-filter button{min-height:39px;border:1px solid #653043;background:#1a0d13;color:#ccaaba;font:11px var(--mono);padding:10px 13px}
+.review-filter button[aria-pressed="true"]{background:var(--red);border-color:var(--hot);color:#fff}
+.review-item[hidden]{display:none!important}
+.review-round.empty-round{opacity:.45}
+html{scroll-padding-bottom:105px}
+input,textarea,select,button,summary{scroll-margin-bottom:115px}
+@media(max-width:580px){.session-toggle{width:38px;min-width:38px;padding:7px;font-size:0}.session-toggle .session-glyph{font-size:19px}.save-toggle{font-size:0;width:40px;min-width:40px;padding:10px 6px}.save-toggle .save-dot{margin:0;width:8px;height:8px}.save-toggle:after{content:"SAVE";font:8px var(--mono);margin-left:3px}.mast-right{gap:5px}.session-body{padding:21px}.session-questions{grid-template-columns:repeat(7,minmax(0,1fr))}.session-number{padding:12px 7px}.session-number b{font-size:30px}.session-number span{font-size:9px}.review-signal{padding:16px}}
 </style>
 </head>
 <body>
@@ -198,10 +235,12 @@ dialog::backdrop{background:rgba(0,0,0,.83);backdrop-filter:blur(8px)}
 <header class="mast">
 <button class="wordmark" type="button" data-action="home" aria-label="THRESHOLD — return to start"><span class="logo-mark" aria-hidden="true">T</span><span class="logo-type">THRESH<span>OLD</span></span></button>
 <div class="mast-center">FOUR ROUNDS&nbsp; / &nbsp;TWENTY-FIVE QUESTIONS</div>
-<div class="mast-right"><span class="mast-step" id="mastStep">00 <span style="color:#78616b">/</span> 25</span><button class="save-toggle" data-action="toggle-save" id="saveToggle" type="button" aria-pressed="false"><span class="save-dot" aria-hidden="true"></span>SAVE ON DEVICE: OFF</button></div>
+<div class="mast-right"><button class="session-toggle" type="button" data-action="session-open" aria-label="Open session index">SESSION <span class="session-glyph" aria-hidden="true">☷</span></button><span class="mast-step" id="mastStep">00 <span style="color:#78616b">/</span> 25</span><button class="save-toggle" data-action="toggle-save" id="saveToggle" type="button" aria-pressed="false"><span class="save-dot" aria-hidden="true"></span>SAVE ON DEVICE: OFF</button></div>
 </header>
 <main id="screen" aria-live="off"></main>
 <footer class="site-footer"><span>THRESHOLD <em>///</em> FOUR ROUNDS</span><span>LOCAL EXPERIENCE&nbsp; / &nbsp;ONE COMPLETE RECORD</span></footer>
+<dialog id="sessionDialog" aria-labelledby="sessionTitle"><div class="session-body"><div class="overline">QUESTION INDEX / LOCAL RECORD</div><div class="session-head"><h2 id="sessionTitle">SESSION.</h2><button class="btn btn-small btn-quiet" data-action="session-close" type="button">CLOSE ✕</button></div><div id="sessionPanel"></div></div></dialog>
+<dialog id="importDialog" aria-labelledby="importTitle"><div class="dialog-body"><div class="overline">OFFLINE SESSION RESTORE</div><h2 id="importTitle">RELOAD RECORD.</h2><p>Choose a THRESHOLD JSON export. The file stays on this device. Review the contents summary before replacing the current session.</p><div class="import-drop"><label for="importFile">YOUR .JSON FILE</label><input id="importFile" type="file" accept=".json,application/json"></div><p class="import-state" id="importMessage" role="status">No file selected.</p><div id="importDetails" class="import-details" hidden></div><div class="dialog-actions"><button class="btn btn-quiet" data-action="import-close" type="button">CANCEL</button><button class="btn btn-primary" data-action="import-apply" type="button" id="importApply" disabled>REPLACE SESSION <span class="arrow">↗</span></button></div></div></dialog>
 <dialog id="resetDialog" aria-labelledby="resetTitle"><div class="dialog-body"><div class="overline">CLEAR SESSION</div><h2 id="resetTitle">ERASE RESPONSES?</h2><p>This clears every answer, selection, and custom limit in this browser session, including locally saved answers.</p><div class="dialog-actions"><button class="btn btn-quiet" type="button" data-action="cancel-reset">KEEP RESPONSES</button><button class="btn btn-primary" type="button" data-action="confirm-reset">CLEAR EVERYTHING <span class="arrow">→</span></button></div></div></dialog>
 <dialog id="copyDialog" aria-labelledby="copyTitle"><div class="dialog-body"><div class="overline">MANUAL COPY</div><h2 id="copyTitle">YOUR COMPLETE RECORD.</h2><p>Your browser didn't allow automatic copying. Select the text below and copy it manually.</p><textarea id="manualCopy" class="dialog-text" readonly aria-label="Complete response text for manual copying"></textarea><div class="dialog-actions"><button class="btn btn-primary" type="button" data-action="select-manual">SELECT ALL TEXT <span class="arrow">↗</span></button><button class="btn btn-quiet" type="button" data-action="close-copy">CLOSE</button></div></div></dialog>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
@@ -255,7 +294,7 @@ const META={
 };
 if(QUESTIONS.length!==25||TOPICS.length!==50)throw Error('Source data count invariant failed');
 const STORAGE_KEY='threshold.session.1';
-function newState(){return{view:'intro',current:1,pendingRound:0,answers:{},limits:{},custom:[],autosave:false,filter:{query:'',category:'ALL',status:'ALL'},editCustom:null}}
+function newState(){return{view:'intro',current:1,pendingRound:0,reviewFilter:'ALL',answers:{},limits:{},custom:[],autosave:false,filter:{query:'',category:'ALL',status:'ALL'},editCustom:null}}
 function retrieveState(){
  try{
   const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return null;
@@ -325,9 +364,97 @@ function render(){
  else if(state.view==='review')html=renderReview();
  else html=renderQuestion(state.current);
  screen.innerHTML=`<div class="stage-enter">${html}</div>`;
- if(state.view==='review'){const pre=$('#exportPreview');if(pre)pre.value=exportText()}
+ if(state.view==='review'){const pre=$('#exportPreview');if(pre)pre.value=exportText();updateReviewFilter(state.reviewFilter)}
  window.scrollTo({top:0,behavior:'instant'});
 }
+
+// Session index and portable offline restore
+let pendingImport=null;
+function renderSessionPanel(){
+ const filled=answeredCount(),hard=hardCount(),classed=classifiedCount();
+ return `<div class="session-numbers"><div class="session-number"><b>${filled}/25</b><span>QUESTIONS TOUCHED</span></div><div class="session-number"><b>${classed}</b><span>TOPICS CLASSIFIED</span></div><div class="session-number"><b>${hard}</b><span>HARD LIMITS MARKED</span></div></div>
+ ${ROUNDS.map(r=>`<div class="session-round"><div class="session-round-label"><span>${r.n} / ${esc(r.short)}</span><span>${QUESTIONS.filter(q=>q.id>=r.start&&q.id<=r.end&&isAnswered(q)).length} / ${r.end-r.start+1}</span></div><div class="session-questions">${QUESTIONS.filter(q=>q.id>=r.start&&q.id<=r.end).map(q=>`<button class="session-jump ${isAnswered(q)?'answered':''}" data-action="session-jump" data-q="${q.id}" type="button" aria-label="Go to question ${q.id}, ${isAnswered(q)?'answered':'not yet answered'}">${two(q.id)}</button>`).join('')}</div></div>`).join('')}
+ <div class="session-actions"><button class="btn btn-primary" type="button" data-action="session-backup">SAVE JSON COPY ↓</button><button class="btn btn-quiet" type="button" data-action="import-open">RESTORE JSON ↑</button><button class="btn btn-quiet" type="button" data-action="session-review">REVIEW RECORD ↗</button><button class="btn btn-quiet" type="button" data-action="session-reset">CLEAR RECORD</button></div>
+ <p class="control-hint" style="margin-top:19px">SAVE ON DEVICE: ${state.autosave?'ON':'OFF'} — Device saving and portable JSON copies are separate.</p>`;
+}
+function openSession(){
+ const p=$('#sessionPanel');p.innerHTML=renderSessionPanel();
+ $('#sessionDialog').showModal();
+}
+function formatImportStatus(s){return s==='UNCLASSIFIED'||s===''?'':s}
+function validatePortableJSON(doc){
+ if(!doc||doc.document!=='THRESHOLD'||!Array.isArray(doc.rounds)||doc.rounds.length!==4)throw Error('Not a THRESHOLD record with four rounds.');
+ if(!doc.limits||!Array.isArray(doc.limits.predefined)||doc.limits.predefined.length!==TOPICS.length||!Array.isArray(doc.limits.custom))throw Error('The limits index is missing or incomplete.');
+ const fail=(what)=>{throw Error('Invalid or incompatible record: '+what)};
+ const answers={},limits={},custom=[];
+ let touched=0,hard=0;
+ for(let r=0;r<ROUNDS.length;r++){
+  const group=doc.rounds[r],expected=QUESTIONS.filter(q=>q.id>=ROUNDS[r].start&&q.id<=ROUNDS[r].end);
+  if(!group||!Array.isArray(group.questions)||group.questions.length!==expected.length)fail('round '+(r+1));
+  for(let j=0;j<expected.length;j++){
+   const q=group.questions[j],canonical=expected[j],meta=META[canonical.id];
+   if(!q||q.number!==canonical.id||q.question!==canonical.text)fail('question '+canonical.id+' differs from the original text');
+   if(typeof q.response!=='string'||q.response.length>80000)fail('answer '+canonical.id);
+   const raw=q.contextualRaw||{},chosen=raw.chosen??[],values=raw.values??{};
+   if(!Array.isArray(chosen)||!values||typeof values!=='object'||Array.isArray(values))fail('question '+canonical.id+' contextual fields');
+   if(!chosen.every(v=>typeof v==='string')||new Set(chosen).size!==chosen.length)fail('question '+canonical.id+' selection');
+   if(meta.kind==='chips'){
+    if(!chosen.every(v=>meta.items.includes(v))||(meta.mode==='single'&&chosen.length>1)||Object.keys(values).length!==0)fail('question '+canonical.id+' choice');
+   }else if(meta.kind==='scales'){
+    if(chosen.length||!Object.keys(values).every(k=>meta.scales.some(s=>s[0]===k)&&Number.isInteger(values[k])&&values[k]>=0&&values[k]<=10))fail('question '+canonical.id+' scale');
+   }else if(chosen.length||Object.keys(values).length)fail('question '+canonical.id+' control');
+   answers[canonical.id]={text:q.response,chosen:[...chosen],values:{...values}};
+   if(q.response.trim()||chosen.length||Object.keys(values).length)touched++;
+  }
+ }
+ const accepted=new Set(['UNCLASSIFIED',...STATUS]);
+ const ingestTopic=(topic,reference)=>{
+  if(!topic||typeof topic.note!=='string'||topic.note.length>80000||!accepted.has(topic.classification))fail('limit classification or note');
+  if(reference&&(topic.id!==reference.id||topic.name!==reference.name||topic.category!==reference.category))fail('preset limit mismatch');
+  const status=formatImportStatus(topic.classification);
+  if(status==='HARD LIMIT')hard++;
+  limits[topic.id]={status,note:topic.note};
+ };
+ doc.limits.predefined.forEach((t,i)=>ingestTopic(t,TOPICS[i]));
+ const ids=new Set(TOPICS.map(t=>t.id));
+ for(const topic of doc.limits.custom){
+  if(!topic||typeof topic.id!=='string'||!/^C[a-z0-9_-]{3,63}$/i.test(topic.id)||ids.has(topic.id))fail('custom topic ID');
+  if(typeof topic.name!=='string'||!topic.name.trim()||topic.name.length>160||(topic.category!==undefined&&topic.category!=='CUSTOM'))fail('custom topic name');
+  ids.add(topic.id);custom.push({id:topic.id,name:topic.name});
+  ingestTopic(topic,null);
+ }
+ if(Object.keys(limits).length!==TOPICS.length+custom.length)fail('duplicate limit IDs');
+ const limitActivity=Object.values(limits).some(l=>l.status||l.note.trim())||custom.length>0;
+ if(limitActivity&&!answers[25].text.trim()&&!Object.keys(answers[25].values).length)touched=Math.min(25,touched+1);
+ return {answers,limits,custom,summary:{touched,hard,custom:custom.length,preset:TOPICS.length,date:typeof doc.date==='string'&&doc.date.length<80?doc.date:'Not recorded'}};
+}
+async function selectImportFile(file){
+ pendingImport=null;
+ const apply=$('#importApply'),info=$('#importMessage'),details=$('#importDetails');
+ apply.disabled=true;details.hidden=true;details.textContent='';
+ if(!file){info.textContent='No file selected.';return}
+ if(file.size>4*1024*1024){info.textContent='File exceeds the 4 MB session limit.';return}
+ info.textContent='READING LOCAL FILE…';
+ try{
+  const content=typeof file.text==='function'?await file.text():await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('Unable to read file'));reader.readAsText(file)});
+  const record=validatePortableJSON(JSON.parse(content));
+  pendingImport=record;
+  const d=record.summary;
+  info.textContent='VALID THRESHOLD RECORD / READY';
+  details.textContent=d.touched+' OF 25 QUESTIONS TOUCHED · '+d.preset+' PRESET LIMITS · '+d.custom+' CUSTOM TOPICS · '+d.hard+' HARD LIMITS. Export date: '+d.date+'.';
+  details.hidden=false;apply.disabled=false;
+ }catch(e){info.textContent=(e instanceof SyntaxError?'Not a valid JSON file.':e.message||'Unable to open record.');}
+}
+function applyImport(){
+ if(!pendingImport)return;
+ const record=pendingImport;
+ state.answers=record.answers;state.limits=record.limits;state.custom=record.custom;
+ state.filter={query:'',category:'ALL',status:'ALL'};state.current=1;state.pendingRound=0;state.view='intro';state.reviewFilter='ALL';
+ pendingImport=null;
+ if(state.autosave)persist();
+ $('#importDialog').close();render();toast('COMPLETE SESSION RESTORED.');
+}
+
 function renderIntro(){
  return `<section class="landing">
   <div class="cover-grid">
@@ -336,7 +463,7 @@ function renderIntro(){
     <h1 class="cover-title">THRESH<em>O</em>LD</h1>
     <p class="cover-explainer">You are going to give me an understanding of where your experience threshold is.</p>
     <p class="cover-instruction">This will occur across four rounds.<br>Don't think too hard about it - respond reflexively.</p>
-    <div class="cover-actions"><button class="btn btn-primary" type="button" data-action="start">BEGIN / FIRST ROUND <span class="arrow">↗</span></button><span class="micro-label">25 QUESTIONS<br>FOUR ROUNDS<br>ONE COMPLETE RECORD</span></div>
+    <div class="cover-actions"><button class="btn btn-primary" type="button" data-action="start">BEGIN / FIRST ROUND <span class="arrow">↗</span></button><button type="button" class="btn btn-quiet" data-action="import-open">RESTORE .JSON ↑</button><span class="micro-label">25 QUESTIONS<br>FOUR ROUNDS<br>ONE COMPLETE RECORD</span></div>
    </div>
    <div class="cover-graphic" aria-hidden="true"><div class="halo"></div><div class="orbit-cross"></div><div class="halo-center"><span class="num">25</span><span class="num-label">INTERROGATIONS</span></div><div class="halo-small a">POSITION / UNKNOWN</div><div class="halo-small b">BOUNDARY / IN FLUX</div><div class="halo-small c">YOU ARE HERE — 00/25</div></div>
   </div>
@@ -378,7 +505,7 @@ function renderQuestion(id){
  ${id===25?renderLimits():renderControl(id)}
  </section>
  <section class="response-block"><div class="response-header"><label for="answerText">YOUR RESPONSE</label><span>OPEN FIELD / ${two(id)}</span></div>
- <textarea id="answerText" class="answer-area" data-answer="${id}" rows="4" placeholder="Type here. Take the space you need." spellcheck="true">${esc(a.text)}</textarea>
+ <textarea id="answerText" class="answer-area" data-answer="${id}" aria-describedby="activeQuestion" rows="4" placeholder="Type here. Take the space you need." spellcheck="true">${esc(a.text)}</textarea>
  <div class="response-footer"><span id="wordCount">${a.text.trim()?a.text.trim().split(/\s+/).length:0} WORDS</span><span>NOTHING IS SENT</span></div></section>
  </div>
  <nav class="question-actions" aria-label="Question navigation"><button type="button" class="btn btn-quiet" data-action="back">← BACK</button><span class="action-note">QUESTION ${two(id)} / 25</span><button type="button" class="btn btn-primary" data-action="next">${id===25?'REVIEW ALL ANSWERS':'NEXT QUESTION'} <span class="arrow">↗</span></button></nav>
@@ -465,11 +592,12 @@ function renderReview(){
  <div class="export-bar">
  <button type="button" class="btn btn-primary" data-action="copy">COPY ALL ANSWERS <span class="arrow">↗</span></button>
  <button type="button" class="btn btn-quiet" data-action="download-txt">DOWNLOAD .TXT ↓</button>
- <button type="button" class="btn btn-quiet" data-action="download-json">DOWNLOAD .JSON ↓</button>
+ <button type="button" class="btn btn-quiet" data-action="download-json">DOWNLOAD .JSON ↓</button><button type="button" class="btn btn-quiet" data-action="import-open">RESTORE .JSON ↑</button>
  <button type="button" class="btn btn-quiet" data-action="back">← BACK TO 25</button>
  </div>
  <div class="review-statrow"><div class="review-stat"><b>${count}</b><span>QUESTIONS<br>ANSWERED</span></div><div class="review-stat"><b>${classified}</b><span>TOPICS<br>CLASSIFIED</span></div><div class="review-stat"><b>${hardCount()}</b><span>HARD<br>LIMITS</span></div><div class="review-stat"><b>${state.custom.length}</b><span>CUSTOM<br>TOPICS</span></div></div>
- ${ROUNDS.map((r,i)=>`<div class="review-round"><span class="num">${r.n}</span><h2>${esc(r.name)}</h2></div><div class="review-list">${QUESTIONS.filter(q=>q.id>=r.start&&q.id<=r.end).map(q=>{const a=answer(q.id),control=summarizeControl(q.id);return `<article class="review-item"><header><span>${two(q.id)} / 25</span><button type="button" class="inline-link" data-action="jump" data-q="${q.id}">EDIT ↗</button></header><p class="review-q">${esc(q.text)}</p>${control.map(t=>`<span class="review-choice">${esc(t)}</span>`).join('')}<div class="review-answer ${a.text.trim()?'':'empty'}">${a.text.trim()?esc(a.text):'— NOT ANSWERED —'}</div></article>`}).join('')}</div>`).join('')}
+ <div class="review-signal"><div><h2>THE GAPS.</h2><p id="reviewFilterCount">25 QUESTIONS IN THE RECORD</p></div><div class="review-filter" role="group" aria-label="Filter reviewed questions"><button type="button" data-action="review-filter" data-filter="ALL" aria-pressed="true">ALL 25</button><button type="button" data-action="review-filter" data-filter="ANSWERED" aria-pressed="false">ENGAGED / ${count}</button><button type="button" data-action="review-filter" data-filter="OPEN" aria-pressed="false">OPEN / ${25-count}</button>${count<25?`<button type="button" data-action="review-first-open">GO TO FIRST OPEN ↗</button>`:''}</div></div>
+ ${ROUNDS.map((r,i)=>`<div class="review-round"><span class="num">${r.n}</span><h2>${esc(r.name)}</h2></div><div class="review-list">${QUESTIONS.filter(q=>q.id>=r.start&&q.id<=r.end).map(q=>{const a=answer(q.id),control=summarizeControl(q.id);return `<article class="review-item" data-review-item data-engaged="${isAnswered(q)}"><header><span>${two(q.id)} / 25</span><button type="button" class="inline-link" data-action="jump" data-q="${q.id}">EDIT ↗</button></header><p class="review-q">${esc(q.text)}</p>${control.map(t=>`<span class="review-choice">${esc(t)}</span>`).join('')}<div class="review-answer ${a.text.trim()?'':'empty'}">${a.text.trim()?esc(a.text):'— NO WRITTEN RESPONSE —'}</div></article>`}).join('')}</div>`).join('')}
  <div class="review-round"><span class="num">∎</span><h2>LIMITS INDEX / ${TOPICS.length} PREDEFINED + ${state.custom.length} CUSTOM</h2></div>
  <section class="review-limits"><h3>CLASSIFICATIONS.</h3><div style="margin-bottom:14px;color:#a38591;font:11px/1.6 var(--mono)">EVERY TOPIC IS INCLUDED, INCLUDING UNCLASSIFIED ENTRIES.</div>
  ${allLimits().map(t=>{const l=getLimit(t.id);return `<div class="review-limit-row"><div><strong>${esc(t.name)}</strong><small>${esc(t.category)}${l.note?' — '+esc(l.note):''}</small></div><div class="right">${esc(l.status||'UNCLASSIFIED')}</div></div>`}).join('')}
@@ -478,10 +606,24 @@ function renderReview(){
  <div class="review-foot"><div><small>ONE FILE. ONE FULL RECORD. NOTHING SENT.</small><br><button type="button" class="inline-link" data-action="reset-open">CLEAR ALL ANSWERS</button></div><button type="button" class="btn btn-primary" data-action="copy">COPY ALL ANSWERS <span class="arrow">↗</span></button></div>
  </section>`;
 }
+function updateReviewFilter(filter){
+ const normalized=['ALL','ANSWERED','OPEN'].includes(filter)?filter:'ALL';
+ state.reviewFilter=normalized;
+ let visible=0;
+ for(const card of document.querySelectorAll('[data-review-item]')){
+  const engaged=card.dataset.engaged==='true';
+  card.hidden=normalized==='ANSWERED'?!engaged:normalized==='OPEN'?engaged:false;
+  if(!card.hidden)visible++;
+ }
+ for(const button of document.querySelectorAll('[data-action="review-filter"]')){
+  button.setAttribute('aria-pressed',button.dataset.filter===normalized?'true':'false');
+ }
+ const count=$('#reviewFilterCount');if(count)count.textContent=visible+' OF 25 QUESTIONS DISPLAYED';
+}
 function exportObject(){
  return {document:'THRESHOLD',date:new Date().toISOString(),rounds:ROUNDS.map(r=>({name:r.name,questions:QUESTIONS.filter(q=>q.id>=r.start&&q.id<=r.end).map(q=>{
  const a=answer(q.id);return {number:q.id,section:q.section,question:q.text,response:a.text,contextualSelections:summarizeControl(q.id),contextualRaw:{chosen:a.chosen.slice(),values:{...a.values}}}
- })})),limits:{predefined:TOPICS.map(t=>({...t,classification:getLimit(t.id).status||'UNCLASSIFIED',note:getLimit(t.id).note})),custom:state.custom.map(t=>({...t,classification:getLimit(t.id).status||'UNCLASSIFIED',note:getLimit(t.id).note}))}};
+ })})),limits:{predefined:TOPICS.map(t=>({...t,classification:getLimit(t.id).status||'UNCLASSIFIED',note:getLimit(t.id).note})),custom:state.custom.map(t=>({...t,category:'CUSTOM',classification:getLimit(t.id).status||'UNCLASSIFIED',note:getLimit(t.id).note}))}};
 }
 function exportText(){
  const lines=['THRESHOLD','FOUR ROUNDS / TWENTY-FIVE QUESTIONS','EXPORTED: '+new Date().toLocaleString(),'='.repeat(66),''];
@@ -540,6 +682,24 @@ function updateAnsweredMarker(id){
 function updateWordCount(value){const e=$('#wordCount');if(e)e.textContent=(value.trim()?value.trim().split(/\s+/).length:0)+' WORDS'}
 function handleAction(button){
  const name=button.dataset.action;
+ if(name==='session-open'){openSession();return}
+ if(name==='session-close'){$('#sessionDialog').close();return}
+ if(name==='session-jump'){$('#sessionDialog').close();navigate(Number(button.dataset.q));return}
+ if(name==='session-review'){$('#sessionDialog').close();state.view='review';render();return}
+ if(name==='session-backup'){downloadFile('THRESHOLD_responses.json',JSON.stringify(exportObject(),null,2),'application/json');return}
+ if(name==='session-reset'){$('#sessionDialog').close();$('#resetDialog').showModal();return}
+ if(name==='import-open'){
+  const d=$('#sessionDialog');if(d.open)d.close();
+  pendingImport=null;$('#importFile').value='';$('#importMessage').textContent='No file selected.';
+  $('#importDetails').hidden=true;$('#importApply').disabled=true;
+  $('#importDialog').showModal();return;
+ }
+ if(name==='import-close'){pendingImport=null;$('#importDialog').close();return}
+ if(name==='import-apply'){applyImport();return}
+ if(name==='review-filter'){updateReviewFilter(button.dataset.filter);return}
+ if(name==='review-first-open'){
+  const first=QUESTIONS.find(q=>!isAnswered(q));if(first)navigate(first.id);return
+ }
  if(name==='home'){state.view='intro';render();return}
  if(name==='start'){state.pendingRound=0;state.view='round';render();return}
  if(name==='open-round'){state.pendingRound=Number(button.dataset.index);state.view='round';render();return}
@@ -618,6 +778,7 @@ document.addEventListener('input',e=>{
 });
 document.addEventListener('change',e=>{
  const t=e.target;
+ if(t.id==='importFile'){selectImportFile(t.files?.[0]);return}
  if(t.matches('[data-topic-status]')){
   const id=t.dataset.topicStatus;getLimit(id).status=t.value;
   const card=t.closest('.limit-card');if(card)card.dataset.status=t.value;
@@ -636,6 +797,7 @@ document.addEventListener('keydown',e=>{
  if(e.altKey&&e.key==='ArrowRight'&&state.view==='question'){e.preventDefault();next()}
  if(e.altKey&&e.key==='ArrowLeft'&&state.view==='question'){e.preventDefault();back()}
 });
+$('#importDialog').addEventListener('close',()=>{pendingImport=null;$('#importApply').disabled=true});
 render();
 </script>
 </body>
