@@ -228,6 +228,104 @@ dialog::backdrop{background:rgba(0,0,0,.83);backdrop-filter:blur(8px)}
 html{scroll-padding-bottom:105px}
 input,textarea,select,button,summary{scroll-margin-bottom:115px}
 @media(max-width:580px){.session-toggle{width:38px;min-width:38px;padding:7px;font-size:0}.session-toggle .session-glyph{font-size:19px}.save-toggle{font-size:0;width:40px;min-width:40px;padding:10px 6px}.save-toggle .save-dot{margin:0;width:8px;height:8px}.save-toggle:after{content:"SAVE";font:8px var(--mono);margin-left:3px}.mast-right{gap:5px}.session-body{padding:21px}.session-questions{grid-template-columns:repeat(7,minmax(0,1fr))}.session-number{padding:12px 7px}.session-number b{font-size:30px}.session-number span{font-size:9px}.review-signal{padding:16px}}
+
+/* THRESHOLD signal deck — visual evidence, never an inferred psychological score */
+.signal-deck{margin:34px 0 36px;border:1px solid rgba(255,49,91,.42);background:linear-gradient(135deg,#1d0710 0%,#09080b 65%,#190811 100%);position:relative;overflow:hidden}
+.signal-deck:before{content:"";position:absolute;right:-105px;top:-80px;width:360px;aspect-ratio:1;border:1px solid rgba(255,34,78,.2);border-radius:50%;box-shadow:0 0 0 44px rgba(255,25,69,.025),0 0 0 92px rgba(255,25,69,.02);pointer-events:none}
+.signal-header{padding:26px clamp(17px,3vw,36px) 22px;border-bottom:1px solid var(--rim);display:flex;gap:20px;justify-content:space-between;align-items:flex-end;flex-wrap:wrap}
+.signal-eyebrow{font:10px var(--mono);color:var(--hot);letter-spacing:.19em;text-transform:uppercase}
+.signal-heading{font:900 clamp(49px,7.5vw,103px)/.9 var(--display);letter-spacing:-.045em;margin:12px 0 2px;text-transform:uppercase}
+.signal-heading em{font-style:normal;color:var(--hot)}
+.signal-caption{font:11px/1.7 var(--mono);color:#b3939d;max-width:270px}
+.signal-grid{display:grid;grid-template-columns:1fr 1fr;min-width:0}
+.signal-module{padding:26px clamp(16px,2.5vw,33px);border-bottom:1px solid var(--rim);min-width:0}
+.signal-module:nth-child(2n+1){border-right:1px solid var(--rim)}
+.signal-module-title{font:700 13px var(--mono);letter-spacing:.13em;color:#fff;text-transform:uppercase;margin:0 0 6px}
+.signal-module-note{font:10px/1.6 var(--mono);letter-spacing:.05em;color:#9a7885;margin:0 0 23px}
+.signal-dual{margin-top:16px;border-top:1px solid rgba(255,255,255,.065);padding-top:15px}
+.signal-dual:first-of-type{margin-top:0;border-top:0;padding-top:0}
+.signal-dual-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font:11px/1.4 var(--mono);margin:0 0 13px}
+.signal-dual-head span{color:#f2dfe4}.signal-dual-head button{font:10px var(--mono);color:#f97091;border:0;background:none;padding:5px;white-space:nowrap;text-decoration:underline;text-underline-offset:3px}
+.signal-dual-head button:hover{color:#fff}
+.signal-meter-row{display:grid;grid-template-columns:minmax(0,94px) minmax(0,1fr) 36px;align-items:center;gap:11px;margin:9px 0}
+.signal-meter-label{font:9px/1.2 var(--mono);color:#bc9da8;text-transform:uppercase;overflow-wrap:anywhere}
+.signal-meter{position:relative;height:9px;background:rgba(130,65,85,.24);overflow:hidden}
+.signal-fill{height:100%;display:block;width:var(--signal-width);background:linear-gradient(90deg,#5a0c23,#ff1744);box-shadow:0 0 14px rgba(245,25,78,.34);animation:signal-slide .7s var(--ease) both}
+.signal-fill.secondary{background:linear-gradient(90deg,#5c3040,#d4a0b0);box-shadow:none}
+.signal-fill.alt{background:linear-gradient(90deg,#6d1644,#ee4778)}
+@keyframes signal-slide{from{transform:scaleX(0);transform-origin:left}to{transform:scaleX(1);transform-origin:left}}
+.signal-meter-value{font:800 18px var(--display);text-align:right;color:#fff}
+.signal-no-data{border:1px dashed rgba(255,101,146,.25);padding:15px;color:#8e6d7b;font:11px/1.7 var(--mono)}
+.signal-category{display:grid;grid-template-columns:minmax(90px,1fr) minmax(0,1.7fr) 43px;gap:12px;align-items:center;width:100%;background:transparent;border:0;border-top:1px solid rgba(255,255,255,.075);color:#e8cad4;text-align:left;padding:14px 0}
+.signal-category:hover .signal-category-name,.signal-category:focus-visible .signal-category-name{color:#fff}
+.signal-category-name{font:10px/1.25 var(--mono);letter-spacing:.04em}
+.signal-rail{display:flex;gap:3px;height:10px}
+.signal-rail-part{height:100%;width:var(--part-width);background:var(--part-color);min-width:0}
+.signal-rail-empty{flex:1;background:repeating-linear-gradient(45deg,#3a212d 0 3px,#24111c 3px 6px)}
+.signal-cat-count{font:700 14px var(--mono);text-align:right;color:#ffc6d4}
+.signal-status-legend{display:flex;gap:9px 14px;flex-wrap:wrap;margin:20px 0 0}
+.signal-legend-item{font:9px/1.4 var(--mono);color:#c79eac;display:inline-flex;gap:7px;align-items:center}
+.signal-legend-item:before{content:"";width:8px;height:8px;background:var(--part-color);display:inline-block;flex-shrink:0}
+.signal-round{display:flex;align-items:center;gap:11px;margin:14px 0 0}
+.signal-round-id{font:800 21px var(--display);color:#e4436f;width:20px}
+.signal-round-bar{flex:1;height:9px;background:#2b1720;overflow:hidden}
+.signal-round-fill{height:100%;width:var(--signal-width);background:linear-gradient(90deg,#770a2a,#ff1d4b)}
+.signal-round-count{font:11px var(--mono);color:#f5d1dc;white-space:nowrap}
+.signal-deck-end{padding:14px clamp(17px,3vw,36px);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--rim);color:#865d6c;font:9px/1.6 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+@media(max-width:840px){.signal-grid{grid-template-columns:1fr}.signal-module:nth-child(2n+1){border-right:0}.signal-header{align-items:flex-start}.signal-heading{font-size:clamp(58px,12vw,92px)}}
+@media(max-width:390px){.signal-module{padding:20px 15px}.signal-category{grid-template-columns:minmax(90px,1fr) minmax(0,1fr) 34px;gap:7px}.signal-meter-row{grid-template-columns:minmax(0,73px) minmax(0,1fr) 29px;gap:7px}.signal-meter-label{font-size:8px}}
+@media(prefers-reduced-motion:reduce){.signal-fill{animation:none}}
+
+
+/* Password-protected offline backup controls */
+.lock-fields{display:grid;gap:13px;margin:20px 0 12px}
+.lock-fields label{display:block;color:#e3abbc;font:10px var(--mono);letter-spacing:.12em;margin-bottom:7px}
+.lock-fields input{width:100%;background:#0c090d;border:1px solid #6c3850;color:#fff;padding:14px;font:16px var(--body);border-radius:0}
+.lock-fields input:focus{outline:2px solid var(--hot);outline-offset:2px}
+.lock-hint{font:11px/1.7 var(--mono);color:#b38a99}
+.lock-status{font:11px/1.6 var(--mono);color:#ff99b6;min-height:19px;margin:10px 0}
+.locked-open{padding:14px;margin:14px 0;background:#2a0718;border:1px solid #a3395c}
+.locked-open[hidden]{display:none}
+.locked-open h3{font:900 24px var(--display);margin:0 0 10px}
+.locked-open button{margin-top:10px}
+.locked-open .lock-hint{margin-bottom:0}
+
+
+/* Paper output retains the complete questionnaire, regardless of review filters */
+@media print{
+ @page{margin:15mm}
+ html,body,#screen{background:#fff!important;color:#111!important}
+ html *,body *,#screen *{text-shadow:none!important;box-shadow:none!important}
+ body:before,.mast,.top-rule,.site-footer,.toast,dialog,.export-bar,.review-signal,.signal-deck,.review-preview,.review-foot,.inline-link{display:none!important}
+ .review{padding:0;max-width:none;margin:0;overflow:visible}
+ .review-head{display:block;border-bottom:2px solid #111;padding-bottom:11px;margin-bottom:12px}
+ .review-title{font-size:59px!important;line-height:1.1;color:#111!important}
+ .review-title span,.review-round .num{color:#9a1230!important}
+ .review-sub,.review-head .overline{font-size:11px;color:#555!important}
+ .review-statrow{margin:0 0 14px;gap:7px}
+ .review-stat{background:#fff!important;border:1px solid #ccc!important;padding:6px;min-width:0}
+ .review-stat b,.review-stat span{color:#111!important}
+ .review-stat b{font-size:20px}
+ .review-round{break-after:avoid;border-bottom:1px solid #444}
+ .review-round h2{color:#111!important}
+ .review-list{display:block}
+ .review-item,.review-item[hidden]{display:block!important;break-inside:avoid;border:1px solid #ccc!important;background:#fff!important;color:#111!important;margin:0 0 9px;padding:11px}
+ .review-item header{margin-bottom:8px}
+ .review-item header span{color:#981735!important}
+ .review-q{font-size:13px!important;color:#111!important}
+ .review-answer,.review-answer.empty{font-size:12px!important;color:#222!important;border-top:1px solid #ccc!important;white-space:pre-wrap}
+ .review-choice{font-size:10px!important;color:#111!important;background:#eee!important;border:1px solid #ccc!important}
+ .review-limits{border:0;background:#fff!important;color:#111!important;padding:0}
+ .review-limits h3{font-size:28px;color:#111!important}
+ .review-limit-row{break-inside:avoid;border-bottom:1px solid #ddd}
+ .review-limit-row,.review-limit-row small,.review-limit-row .right{color:#222!important}
+ .review-limit-row .right{font-weight:700}
+}
+
+.scale-adjust{display:flex;align-items:center;justify-content:space-between;gap:9px;margin-top:12px}
+.scale-nudge{width:42px;min-height:34px;background:#2c0b17;border:1px solid #743147;color:#f4cad7;font:700 22px/1 var(--mono);transition:background .15s,transform .15s}
+.scale-nudge:hover{background:#8e153b;color:#fff}.scale-nudge:active{transform:translateY(2px);background:#eb1247}
+.scale-nudge-label{font:9px/1.2 var(--mono);letter-spacing:.08em;color:#90717d;text-align:center}
 </style>
 </head>
 <body>
@@ -240,7 +338,16 @@ input,textarea,select,button,summary{scroll-margin-bottom:115px}
 <main id="screen" aria-live="off"></main>
 <footer class="site-footer"><span>THRESHOLD <em>///</em> FOUR ROUNDS</span><span>LOCAL EXPERIENCE&nbsp; / &nbsp;ONE COMPLETE RECORD</span></footer>
 <dialog id="sessionDialog" aria-labelledby="sessionTitle"><div class="session-body"><div class="overline">QUESTION INDEX / LOCAL RECORD</div><div class="session-head"><h2 id="sessionTitle">SESSION.</h2><button class="btn btn-small btn-quiet" data-action="session-close" type="button">CLOSE ✕</button></div><div id="sessionPanel"></div></div></dialog>
-<dialog id="importDialog" aria-labelledby="importTitle"><div class="dialog-body"><div class="overline">OFFLINE SESSION RESTORE</div><h2 id="importTitle">RELOAD RECORD.</h2><p>Choose a THRESHOLD JSON export. The file stays on this device. Review the contents summary before replacing the current session.</p><div class="import-drop"><label for="importFile">YOUR .JSON FILE</label><input id="importFile" type="file" accept=".json,application/json"></div><p class="import-state" id="importMessage" role="status">No file selected.</p><div id="importDetails" class="import-details" hidden></div><div class="dialog-actions"><button class="btn btn-quiet" data-action="import-close" type="button">CANCEL</button><button class="btn btn-primary" data-action="import-apply" type="button" id="importApply" disabled>REPLACE SESSION <span class="arrow">↗</span></button></div></div></dialog>
+<dialog id="importDialog" aria-labelledby="importTitle"><div class="dialog-body"><div class="overline">OFFLINE SESSION RESTORE</div><h2 id="importTitle">RELOAD RECORD.</h2><p>Choose an ordinary .json record or an encrypted .thx record. Review its contents before replacing the current session.</p><div class="import-drop"><label for="importFile">YOUR .JSON OR .THX FILE</label><input id="importFile" type="file" accept=".json,.thx,application/json"></div><p class="import-state" id="importMessage" role="status">No file selected.</p><div id="importDetails" class="import-details" hidden></div><div id="importUnlock" class="locked-open" hidden><h3>LOCKED RECORD.</h3><label for="importPass" class="lock-hint">BACKUP PASSPHRASE</label><div class="lock-fields" style="margin:8px 0"><input id="importPass" type="password" autocomplete="off" aria-label="Encrypted backup passphrase" spellcheck="false"></div><button class="btn btn-primary btn-small" type="button" data-action="import-unlock" id="importUnlockButton">UNLOCK RECORD ↗</button></div><div class="dialog-actions"><button class="btn btn-quiet" data-action="import-close" type="button">CANCEL</button><button class="btn btn-primary" data-action="import-apply" type="button" id="importApply" disabled>REPLACE SESSION <span class="arrow">↗</span></button></div></div></dialog>
+<dialog id="lockDialog" aria-labelledby="lockTitle"><div class="dialog-body">
+<div class="overline">OFFLINE ENCRYPTED BACKUP</div><h2 id="lockTitle">LOCK THE RECORD.</h2>
+<p>Create a separate password-protected copy of this session. Your ordinary JSON and TXT exports stay available.</p>
+<div class="lock-fields"><div><label for="lockPass">PASSPHRASE / MINIMUM 8 CHARACTERS</label><input id="lockPass" type="password" autocomplete="new-password" spellcheck="false"></div>
+<div><label for="lockConfirm">REPEAT PASSPHRASE</label><input id="lockConfirm" type="password" autocomplete="new-password" spellcheck="false"></div></div>
+<p class="lock-hint">Keep this passphrase. The encrypted .thx file cannot be restored without it. The passphrase is not stored by THRESHOLD.</p>
+<p class="lock-status" id="lockMessage" role="status"></p>
+<div class="dialog-actions"><button type="button" class="btn btn-quiet" data-action="lock-close">CANCEL</button><button type="button" class="btn btn-primary" data-action="lock-write" id="lockSave">ENCRYPT + SAVE ↓</button></div>
+</div></dialog>
 <dialog id="resetDialog" aria-labelledby="resetTitle"><div class="dialog-body"><div class="overline">CLEAR SESSION</div><h2 id="resetTitle">ERASE RESPONSES?</h2><p>This clears every answer, selection, and custom limit in this browser session, including locally saved answers.</p><div class="dialog-actions"><button class="btn btn-quiet" type="button" data-action="cancel-reset">KEEP RESPONSES</button><button class="btn btn-primary" type="button" data-action="confirm-reset">CLEAR EVERYTHING <span class="arrow">→</span></button></div></div></dialog>
 <dialog id="copyDialog" aria-labelledby="copyTitle"><div class="dialog-body"><div class="overline">MANUAL COPY</div><h2 id="copyTitle">YOUR COMPLETE RECORD.</h2><p>Your browser didn't allow automatic copying. Select the text below and copy it manually.</p><textarea id="manualCopy" class="dialog-text" readonly aria-label="Complete response text for manual copying"></textarea><div class="dialog-actions"><button class="btn btn-primary" type="button" data-action="select-manual">SELECT ALL TEXT <span class="arrow">↗</span></button><button class="btn btn-quiet" type="button" data-action="close-copy">CLOSE</button></div></div></dialog>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
@@ -365,6 +472,8 @@ function render(){
  else html=renderQuestion(state.current);
  screen.innerHTML=`<div class="stage-enter">${html}</div>`;
  if(state.view==='review'){const pre=$('#exportPreview');if(pre)pre.value=exportText();updateReviewFilter(state.reviewFilter)}
+ const nextHeading=state.view==='question'?$('#activeQuestion'):state.view==='review'?$('.review-title'):state.view==='round'?$('.interlude-title'):null;
+ if(nextHeading){nextHeading.setAttribute('tabindex','-1');nextHeading.focus({preventScroll:true})}
  window.scrollTo({top:0,behavior:'instant'});
 }
 
@@ -374,7 +483,7 @@ function renderSessionPanel(){
  const filled=answeredCount(),hard=hardCount(),classed=classifiedCount();
  return `<div class="session-numbers"><div class="session-number"><b>${filled}/25</b><span>QUESTIONS TOUCHED</span></div><div class="session-number"><b>${classed}</b><span>TOPICS CLASSIFIED</span></div><div class="session-number"><b>${hard}</b><span>HARD LIMITS MARKED</span></div></div>
  ${ROUNDS.map(r=>`<div class="session-round"><div class="session-round-label"><span>${r.n} / ${esc(r.short)}</span><span>${QUESTIONS.filter(q=>q.id>=r.start&&q.id<=r.end&&isAnswered(q)).length} / ${r.end-r.start+1}</span></div><div class="session-questions">${QUESTIONS.filter(q=>q.id>=r.start&&q.id<=r.end).map(q=>`<button class="session-jump ${isAnswered(q)?'answered':''}" data-action="session-jump" data-q="${q.id}" type="button" aria-label="Go to question ${q.id}, ${isAnswered(q)?'answered':'not yet answered'}">${two(q.id)}</button>`).join('')}</div></div>`).join('')}
- <div class="session-actions"><button class="btn btn-primary" type="button" data-action="session-backup">SAVE JSON COPY ↓</button><button class="btn btn-quiet" type="button" data-action="import-open">RESTORE JSON ↑</button><button class="btn btn-quiet" type="button" data-action="session-review">REVIEW RECORD ↗</button><button class="btn btn-quiet" type="button" data-action="session-reset">CLEAR RECORD</button></div>
+ <div class="session-actions"><button class="btn btn-primary" type="button" data-action="session-backup">SAVE JSON COPY ↓</button><button class="btn btn-primary" type="button" data-action="lock-open">ENCRYPTED BACKUP ↓</button><button class="btn btn-quiet" type="button" data-action="import-open">RESTORE JSON ↑</button><button class="btn btn-quiet" type="button" data-action="session-review">REVIEW RECORD ↗</button><button class="btn btn-quiet" type="button" data-action="session-reset">CLEAR RECORD</button></div>
  <p class="control-hint" style="margin-top:19px">SAVE ON DEVICE: ${state.autosave?'ON':'OFF'} — Device saving and portable JSON copies are separate.</p>`;
 }
 function openSession(){
@@ -428,29 +537,115 @@ function validatePortableJSON(doc){
  if(limitActivity&&!answers[25].text.trim()&&!Object.keys(answers[25].values).length)touched=Math.min(25,touched+1);
  return {answers,limits,custom,summary:{touched,hard,custom:custom.length,preset:TOPICS.length,date:typeof doc.date==='string'&&doc.date.length<80?doc.date:'Not recorded'}};
 }
+
+const LOCK_FORMAT='THRESHOLD-LOCKED';
+const LOCK_ITERATIONS=210000;
+let pendingLocked=null;
+function browserCryptoReady(){
+ return typeof crypto!=='undefined'&&Boolean(crypto.subtle)&&typeof crypto.getRandomValues==='function';
+}
+function bytesToBase64(data){
+ let result='';for(let i=0;i<data.length;i+=8192)result+=String.fromCharCode(...data.subarray(i,i+8192));
+ return btoa(result);
+}
+function base64ToBytes(encoded){
+ if(typeof encoded!=='string'||encoded.length>5800000||!/^[A-Za-z0-9+/]*={0,2}$/.test(encoded))throw Error('Invalid encrypted file.');
+ const binary=atob(encoded);return Uint8Array.from(binary,c=>c.charCodeAt(0));
+}
+async function backupKey(passphrase,salt,iterations){
+ if(!browserCryptoReady())throw Error('Encrypted backup is not supported in this browser.');
+ const material=await crypto.subtle.importKey('raw',new TextEncoder().encode(passphrase),'PBKDF2',false,['deriveKey']);
+ return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations,hash:'SHA-256'},material,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+}
+async function sealSession(passphrase){
+ if(typeof passphrase!=='string'||passphrase.length<8)throw Error('Passphrase must contain at least eight characters.');
+ if(!browserCryptoReady())throw Error('Encrypted backup is unavailable in this browser.');
+ const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));
+ const key=await backupKey(passphrase,salt,LOCK_ITERATIONS);
+ const plain=new TextEncoder().encode(JSON.stringify(exportObject()));
+ const encrypted=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},key,plain));
+ return JSON.stringify({format:LOCK_FORMAT,version:1,algorithm:'AES-256-GCM',kdf:'PBKDF2-SHA256',iterations:LOCK_ITERATIONS,salt:bytesToBase64(salt),iv:bytesToBase64(iv),data:bytesToBase64(encrypted)},null,2);
+}
+function validateLockedEnvelope(payload){
+ if(!payload||payload.format!==LOCK_FORMAT||payload.version!==1||payload.algorithm!=='AES-256-GCM'||payload.kdf!=='PBKDF2-SHA256')throw Error('Unsupported encrypted record.');
+ if(!Number.isInteger(payload.iterations)||payload.iterations<100000||payload.iterations>500000)throw Error('Invalid encrypted record.');
+ const salt=base64ToBytes(payload.salt),iv=base64ToBytes(payload.iv),data=base64ToBytes(payload.data);
+ if(salt.length!==16||iv.length!==12||data.length<16||data.length>4000000)throw Error('Invalid encrypted record.');
+ return {salt,iv,data};
+}
+async function unsealSession(payload,passphrase){
+ const part=validateLockedEnvelope(payload),key=await backupKey(passphrase,part.salt,payload.iterations);
+ const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:part.iv},key,part.data);
+ return new TextDecoder('utf-8',{fatal:true}).decode(plain);
+}
+function openLockDialog(){
+ const dialog=$('#lockDialog');
+ $('#lockPass').value='';$('#lockConfirm').value='';
+ $('#lockMessage').textContent=browserCryptoReady()?'Passphrase is never stored. Keep it to open this file later.':'This browser cannot encrypt an offline file.';
+ $('#lockSave').disabled=!browserCryptoReady();
+ dialog.showModal();$('#lockPass').focus();
+}
+async function writeLockedBackup(){
+ const message=$('#lockMessage'),pass=$('#lockPass').value,confirmation=$('#lockConfirm').value,button=$('#lockSave');
+ if(pass!==confirmation){message.textContent='The two passphrases do not match.';return}
+ if(pass.length<8){message.textContent='Use at least eight characters.';return}
+ button.disabled=true;message.textContent='ENCRYPTING ON THIS DEVICE…';
+ try{
+  const content=await sealSession(pass);
+  downloadFile('THRESHOLD_locked.thx',content,'application/json');
+  $('#lockPass').value='';$('#lockConfirm').value='';$('#lockDialog').close();
+  toast('ENCRYPTED BACKUP PREPARED.');
+ }catch(error){message.textContent=error?.message||'Encrypted backup failed.'}
+ finally{button.disabled=false}
+}
+function showImportSummary(record){
+ pendingImport=record;
+ const info=$('#importMessage'),details=$('#importDetails'),d=record.summary;
+ info.textContent='VALID THRESHOLD RECORD / READY';
+ details.textContent=d.touched+' OF 25 QUESTIONS TOUCHED · '+d.preset+' PRESET LIMITS · '+d.custom+' CUSTOM TOPICS · '+d.hard+' HARD LIMITS. Export date: '+d.date+'.';
+ details.hidden=false;$('#importApply').disabled=false;
+}
+async function unlockImportedRecord(){
+ const message=$('#importMessage'),password=$('#importPass'),button=$('#importUnlockButton');
+ if(!pendingLocked)return;
+ if(!password.value){message.textContent='Enter the backup passphrase.';password.focus();return}
+ button.disabled=true;message.textContent='UNLOCKING ON THIS DEVICE…';
+ try{
+  const decrypted=await unsealSession(pendingLocked,password.value);
+  const record=validatePortableJSON(JSON.parse(decrypted));
+  pendingLocked=null;password.value='';$('#importUnlock').hidden=true;
+  showImportSummary(record);
+ }catch(error){message.textContent='Unable to unlock this file. Check the passphrase or the file contents.'}
+ finally{button.disabled=false}
+}
 async function selectImportFile(file){
- pendingImport=null;
- const apply=$('#importApply'),info=$('#importMessage'),details=$('#importDetails');
- apply.disabled=true;details.hidden=true;details.textContent='';
+ pendingImport=null;pendingLocked=null;
+ const apply=$('#importApply'),info=$('#importMessage'),details=$('#importDetails'),unlock=$('#importUnlock');
+ apply.disabled=true;details.hidden=true;details.textContent='';unlock.hidden=true;$('#importPass').value='';
  if(!file){info.textContent='No file selected.';return}
  if(file.size>4*1024*1024){info.textContent='File exceeds the 4 MB session limit.';return}
  info.textContent='READING LOCAL FILE…';
  try{
-  const content=typeof file.text==='function'?await file.text():await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('Unable to read file'));reader.readAsText(file)});
-  const record=validatePortableJSON(JSON.parse(content));
-  pendingImport=record;
-  const d=record.summary;
-  info.textContent='VALID THRESHOLD RECORD / READY';
-  details.textContent=d.touched+' OF 25 QUESTIONS TOUCHED · '+d.preset+' PRESET LIMITS · '+d.custom+' CUSTOM TOPICS · '+d.hard+' HARD LIMITS. Export date: '+d.date+'.';
-  details.hidden=false;apply.disabled=false;
- }catch(e){info.textContent=(e instanceof SyntaxError?'Not a valid JSON file.':e.message||'Unable to open record.');}
+  const content=typeof file.text==='function'?await file.text():await new Promise((resolve,reject)=>{
+   const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('Unable to read file'));reader.readAsText(file);
+  });
+  const data=JSON.parse(content);
+  if(data?.format===LOCK_FORMAT){
+   if(!browserCryptoReady())throw Error('Encrypted restore is not supported in this browser.');
+   validateLockedEnvelope(data);
+   pendingLocked=data;unlock.hidden=false;info.textContent='ENCRYPTED BACKUP / PASSPHRASE REQUIRED';
+   $('#importPass').focus();return;
+  }
+  showImportSummary(validatePortableJSON(data));
+ }catch(error){info.textContent=error instanceof SyntaxError?'Not a valid JSON record.':error?.message||'Unable to open record.'}
 }
+
 function applyImport(){
  if(!pendingImport)return;
  const record=pendingImport;
  state.answers=record.answers;state.limits=record.limits;state.custom=record.custom;
  state.filter={query:'',category:'ALL',status:'ALL'};state.current=1;state.pendingRound=0;state.view='intro';state.reviewFilter='ALL';
- pendingImport=null;
+ pendingImport=null;pendingLocked=null;
  if(state.autosave)persist();
  $('#importDialog').close();render();toast('COMPLETE SESSION RESTORED.');
 }
@@ -463,7 +658,7 @@ function renderIntro(){
     <h1 class="cover-title">THRESH<em>O</em>LD</h1>
     <p class="cover-explainer">You are going to give me an understanding of where your experience threshold is.</p>
     <p class="cover-instruction">This will occur across four rounds.<br>Don't think too hard about it - respond reflexively.</p>
-    <div class="cover-actions"><button class="btn btn-primary" type="button" data-action="start">BEGIN / FIRST ROUND <span class="arrow">↗</span></button><button type="button" class="btn btn-quiet" data-action="import-open">RESTORE .JSON ↑</button><span class="micro-label">25 QUESTIONS<br>FOUR ROUNDS<br>ONE COMPLETE RECORD</span></div>
+    <div class="cover-actions"><button class="btn btn-primary" type="button" data-action="start">BEGIN / FIRST ROUND <span class="arrow">↗</span></button><button type="button" class="btn btn-quiet" data-action="import-open">RESTORE RECORD ↑</button><span class="micro-label">25 QUESTIONS<br>FOUR ROUNDS<br>ONE COMPLETE RECORD</span></div>
    </div>
    <div class="cover-graphic" aria-hidden="true"><div class="halo"></div><div class="orbit-cross"></div><div class="halo-center"><span class="num">25</span><span class="num-label">INTERROGATIONS</span></div><div class="halo-small a">POSITION / UNKNOWN</div><div class="halo-small b">BOUNDARY / IN FLUX</div><div class="halo-small c">YOU ARE HERE — 00/25</div></div>
   </div>
@@ -521,7 +716,8 @@ function renderControl(id){
  }
  const grid=m.scales.map(([key,label,min,max])=>{
   const rawValue=a.values[key],value=rawValue===undefined?5:Number(rawValue);
-  return `<div class="scale-box"><label class="scale-label" for="scale-${id}-${esc(key)}"><span>${esc(label)}</span><output class="scale-value" for="scale-${id}-${esc(key)}">${rawValue===undefined?'—':value}</output></label><input id="scale-${id}-${esc(key)}" type="range" min="0" max="10" step="1" value="${value}" style="--amount:${value*10}%" data-scale-q="${id}" data-scale-key="${esc(key)}" aria-label="${esc(label)}: 0 to 10"><div class="scale-ends"><span>${esc(min)}</span><span>${esc(max)}</span></div></div>`;
+  return `<div class="scale-box"><label class="scale-label" for="scale-${id}-${esc(key)}"><span>${esc(label)}</span><output class="scale-value" for="scale-${id}-${esc(key)}">${rawValue===undefined?'—':value}</output></label><input id="scale-${id}-${esc(key)}" type="range" min="0" max="10" step="1" value="${value}" style="--amount:${value*10}%" data-scale-q="${id}" data-scale-key="${esc(key)}" aria-label="${esc(label)}: 0 to 10"><div class="scale-ends"><span>${esc(min)}</span><span>${esc(max)}</span></div>
+<div class="scale-adjust"><button class="scale-nudge" type="button" data-action="scale-step" data-q="${id}" data-key="${esc(key)}" data-delta="-1" aria-label="Decrease ${esc(label)}">−</button><span class="scale-nudge-label">FINE ADJUST / 1 POINT</span><button class="scale-nudge" type="button" data-action="scale-step" data-q="${id}" data-key="${esc(key)}" data-delta="1" aria-label="Increase ${esc(label)}">+</button></div></div>`;
  }).join('');
  return `<div class="instrument-inner"><div class="scale-boxes">${grid}</div><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:20px"><p class="control-hint" style="margin:0">MOVE A CONTROL TO RECORD YOUR POSITION. SCALE 0—10.</p><button class="inline-link" type="button" data-action="clear-control" data-q="${id}" ${exists?'':'disabled'}>CLEAR VALUES</button></div></div>`;
 }
@@ -585,6 +781,60 @@ function summarizeControl(id){
  if(m.scales)for(const [key,label] of m.scales){if(a.values[key]!==undefined)bits.push(label+': '+a.values[key]+'/10')}
  return bits;
 }
+
+const SIGNAL_TONES={
+ 'HARD LIMIT':'#ff2558','SOFT LIMIT':'#eb6b88','FANTASY ONLY':'#9b70ad','CURIOUS':'#c87559',
+ 'EXPERIENCED':'#ded1d8','COMFORTABLE':'#b8a2b2','UNSURE':'#725765'
+};
+function signalBar(label,val,secondary=false){
+ const has=Number.isInteger(val)&&val>=0&&val<=10;
+ return `<div class="signal-meter-row"><span class="signal-meter-label">${esc(label)}</span>
+ <div class="signal-meter" aria-label="${esc(label)}: ${has?val+' out of 10':'not recorded'}">
+ ${has?`<span class="signal-fill ${secondary?'secondary':''}" style="--signal-width:${val*10}%"></span>`:''}</div>
+ <span class="signal-meter-value">${has?val:'—'}</span></div>`;
+}
+function signalPair(id,title,axes){
+ const values=state.answers[id]?.values||{};
+ return `<div class="signal-dual"><div class="signal-dual-head"><span>${esc(title)}</span><button type="button" data-action="signal-question" data-q="${id}" aria-label="Edit question ${id}">Q${two(id)} ↗</button></div>
+ ${axes.some(([key])=>values[key]!==undefined)?axes.map(([key,label],i)=>signalBar(label,values[key],i>0)).join(''):'<div class="signal-no-data">NO RANGE POSITION RECORDED.</div>'}</div>`;
+}
+function signalCategories(){
+ return GROUPS.map(g=>{
+  const list=TOPICS.filter(t=>t.category===g.name);
+  const chosen=list.map(t=>getLimit(t.id).status).filter(Boolean);
+  const counts=Object.fromEntries(STATUS.map(key=>[key,chosen.filter(s=>s===key).length]));
+  const parts=STATUS.filter(s=>counts[s]).map(s=>`<span class="signal-rail-part" style="--part-width:${counts[s]/list.length*100}%;--part-color:${SIGNAL_TONES[s]}" title="${esc(s)}: ${counts[s]}"></span>`).join('');
+  return `<button type="button" class="signal-category" data-action="signal-category" data-category="${esc(g.name)}" aria-label="Open ${esc(g.name)} limits: ${chosen.length} of ${list.length} classified">
+   <span class="signal-category-name">${esc(g.name)}</span><span class="signal-rail">${parts}<span class="signal-rail-empty" style="max-width:${(1-chosen.length/list.length)*100}%"></span></span>
+   <span class="signal-cat-count">${chosen.length}<span style="color:#785864">/${list.length}</span></span></button>`;
+ }).join('');
+}
+function renderSignalDeck(){
+ const axes=[
+  signalPair(1,'BEFORE / NOW',[['BEFORE','THEN'],['NOW','NOW']]),
+  signalPair(12,'PAPER / PRACTICE',[['PAPER','ON PAPER'],['PRACTICE','IN PRACTICE']]),
+  signalPair(19,'FANTASY / EXPERIENCE',[['FANTASY','FANTASY'],['EXPERIENCE','REALITY']])
+ ].join('');
+ const weight=state.answers[14]?.values||{};
+ const trust=Object.keys(weight).length?META[14].scales.map(([key,label])=>signalBar(key,weight[key])).join(''):'<div class="signal-no-data">NO CONTEXT WEIGHTING RECORDED.</div>';
+ return `<section class="signal-deck" aria-labelledby="signalTitle">
+ <div class="signal-header"><div><div class="signal-eyebrow">A READOUT OF THE RECORDED SIGNAL</div><h2 class="signal-heading" id="signalTitle">SIGNAL <em>DECK.</em></h2></div>
+ <p class="signal-caption">Every line is tied to an answer or classification. Unanswered controls remain blank.</p></div>
+ <div class="signal-grid">
+ <article class="signal-module"><h3 class="signal-module-title">01 / THE CONTRASTS</h3><p class="signal-module-note">Three direct comparisons, pulled from questions 01, 12 and 19.</p>${axes}</article>
+ <article class="signal-module"><h3 class="signal-module-title">02 / CONTEXT WEIGHTING</h3><p class="signal-module-note">Question 14 / PERSON, TRUST, SETTING, ACT — four separate values.</p>
+ ${trust}<div style="margin-top:17px"><button type="button" class="inline-link" data-action="signal-question" data-q="14">OPEN QUESTION 14 ↗</button></div></article>
+ <article class="signal-module"><h3 class="signal-module-title">03 / LIMIT DISTRIBUTION</h3><p class="signal-module-note">Classified entries across six topic categories. Select a category to open it.</p>
+ ${signalCategories()}<div class="signal-status-legend">${STATUS.map(s=>`<span class="signal-legend-item" style="--part-color:${SIGNAL_TONES[s]}">${esc(s)} (${TOPICS.filter(t=>getLimit(t.id).status===s).length})</span>`).join('')}</div></article>
+ <article class="signal-module"><h3 class="signal-module-title">04 / ROUND COVERAGE</h3><p class="signal-module-note">Answered-question counts, not intensity or willingness scores.</p>
+ ${ROUNDS.map(r=>{const all=r.end-r.start+1,done=QUESTIONS.filter(q=>q.id>=r.start&&q.id<=r.end&&isAnswered(q)).length;return `<div class="signal-round"><span class="signal-round-id">${r.n}</span><div class="signal-round-bar" aria-label="Round ${r.n}: ${done} of ${all} questions answered"><div class="signal-round-fill" style="--signal-width:${done/all*100}%"></div></div><span class="signal-round-count">${done} / ${all}</span></div>`}).join('')}
+ <div style="margin-top:25px"><button type="button" class="btn btn-quiet btn-small" data-action="signal-first-open">FIRST OPEN QUESTION <span class="arrow">↗</span></button></div>
+ </article>
+ </div>
+ <div class="signal-deck-end"><span>THRESHOLD / MAP OF RECORDED INPUTS</span><span>SELECTIONS, NOT INFERENCES</span></div>
+ </section>`;
+}
+
 function renderReview(){
  const count=answeredCount(),classified=classifiedCount();
  return `<section class="review">
@@ -592,10 +842,11 @@ function renderReview(){
  <div class="export-bar">
  <button type="button" class="btn btn-primary" data-action="copy">COPY ALL ANSWERS <span class="arrow">↗</span></button>
  <button type="button" class="btn btn-quiet" data-action="download-txt">DOWNLOAD .TXT ↓</button>
- <button type="button" class="btn btn-quiet" data-action="download-json">DOWNLOAD .JSON ↓</button><button type="button" class="btn btn-quiet" data-action="import-open">RESTORE .JSON ↑</button>
+ <button type="button" class="btn btn-quiet" data-action="download-json">DOWNLOAD .JSON ↓</button><button type="button" class="btn btn-quiet" data-action="print-review">PRINT / PDF ↓</button><button type="button" class="btn btn-quiet" data-action="lock-open">ENCRYPTED .THX ↓</button><button type="button" class="btn btn-quiet" data-action="import-open">RESTORE RECORD ↑</button>
  <button type="button" class="btn btn-quiet" data-action="back">← BACK TO 25</button>
  </div>
  <div class="review-statrow"><div class="review-stat"><b>${count}</b><span>QUESTIONS<br>ANSWERED</span></div><div class="review-stat"><b>${classified}</b><span>TOPICS<br>CLASSIFIED</span></div><div class="review-stat"><b>${hardCount()}</b><span>HARD<br>LIMITS</span></div><div class="review-stat"><b>${state.custom.length}</b><span>CUSTOM<br>TOPICS</span></div></div>
+ ${renderSignalDeck()}
  <div class="review-signal"><div><h2>THE GAPS.</h2><p id="reviewFilterCount">25 QUESTIONS IN THE RECORD</p></div><div class="review-filter" role="group" aria-label="Filter reviewed questions"><button type="button" data-action="review-filter" data-filter="ALL" aria-pressed="true">ALL 25</button><button type="button" data-action="review-filter" data-filter="ANSWERED" aria-pressed="false">ENGAGED / ${count}</button><button type="button" data-action="review-filter" data-filter="OPEN" aria-pressed="false">OPEN / ${25-count}</button>${count<25?`<button type="button" data-action="review-first-open">GO TO FIRST OPEN ↗</button>`:''}</div></div>
  ${ROUNDS.map((r,i)=>`<div class="review-round"><span class="num">${r.n}</span><h2>${esc(r.name)}</h2></div><div class="review-list">${QUESTIONS.filter(q=>q.id>=r.start&&q.id<=r.end).map(q=>{const a=answer(q.id),control=summarizeControl(q.id);return `<article class="review-item" data-review-item data-engaged="${isAnswered(q)}"><header><span>${two(q.id)} / 25</span><button type="button" class="inline-link" data-action="jump" data-q="${q.id}">EDIT ↗</button></header><p class="review-q">${esc(q.text)}</p>${control.map(t=>`<span class="review-choice">${esc(t)}</span>`).join('')}<div class="review-answer ${a.text.trim()?'':'empty'}">${a.text.trim()?esc(a.text):'— NO WRITTEN RESPONSE —'}</div></article>`}).join('')}</div>`).join('')}
  <div class="review-round"><span class="num">∎</span><h2>LIMITS INDEX / ${TOPICS.length} PREDEFINED + ${state.custom.length} CUSTOM</h2></div>
@@ -683,6 +934,18 @@ function updateWordCount(value){const e=$('#wordCount');if(e)e.textContent=(valu
 function handleAction(button){
  const name=button.dataset.action;
  if(name==='session-open'){openSession();return}
+ if(name==='signal-question'){navigate(Number(button.dataset.q));return}
+ if(name==='signal-category'){
+  state.filter={query:'',category:button.dataset.category,status:'ALL'};
+  navigate(25);
+  requestAnimationFrame(()=>$('#limitSearch')?.scrollIntoView({block:'center',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'}));
+  return;
+ }
+ if(name==='signal-first-open'){const q=QUESTIONS.find(q=>!isAnswered(q));if(q)navigate(q.id);else toast('ALL 25 QUESTIONS ENGAGED.');return}
+ if(name==='lock-open'){const d=$('#sessionDialog');if(d.open)d.close();openLockDialog();return}
+ if(name==='lock-close'){$('#lockDialog').close();return}
+ if(name==='lock-write'){writeLockedBackup();return}
+ if(name==='import-unlock'){unlockImportedRecord();return}
  if(name==='session-close'){$('#sessionDialog').close();return}
  if(name==='session-jump'){$('#sessionDialog').close();navigate(Number(button.dataset.q));return}
  if(name==='session-review'){$('#sessionDialog').close();state.view='review';render();return}
@@ -690,11 +953,11 @@ function handleAction(button){
  if(name==='session-reset'){$('#sessionDialog').close();$('#resetDialog').showModal();return}
  if(name==='import-open'){
   const d=$('#sessionDialog');if(d.open)d.close();
-  pendingImport=null;$('#importFile').value='';$('#importMessage').textContent='No file selected.';
+  pendingImport=null;pendingLocked=null;$('#importFile').value='';$('#importMessage').textContent='No file selected.';$('#importPass').value='';$('#importUnlock').hidden=true;
   $('#importDetails').hidden=true;$('#importApply').disabled=true;
   $('#importDialog').showModal();return;
  }
- if(name==='import-close'){pendingImport=null;$('#importDialog').close();return}
+ if(name==='import-close'){pendingImport=null;pendingLocked=null;$('#importPass').value='';$('#importDialog').close();return}
  if(name==='import-apply'){applyImport();return}
  if(name==='review-filter'){updateReviewFilter(button.dataset.filter);return}
  if(name==='review-first-open'){
@@ -708,6 +971,13 @@ function handleAction(button){
  if(name==='next'){next();return}
  if(name==='back'){back();return}
  if(name==='toggle-save'){enableSave();return}
+ if(name==='scale-step'){
+  const q=Number(button.dataset.q),key=button.dataset.key,change=Number(button.dataset.delta);
+  const slider=$('#scale-'+q+'-'+key);if(!slider||!Number.isFinite(change))return;
+  slider.value=String(Math.max(0,Math.min(10,Number(slider.value)+change)));
+  slider.dispatchEvent(new Event('input',{bubbles:true}));
+  slider.focus();return;
+ }
  if(name==='chip'){
   const id=Number(button.dataset.q),a=answer(id),meta=META[id],value=button.dataset.value;
   if(a.chosen.includes(value))a.chosen=a.chosen.filter(x=>x!==value);
@@ -746,6 +1016,7 @@ function handleAction(button){
  if(name==='copy'){copyAll();return}
  if(name==='download-txt'){downloadFile('THRESHOLD_responses.txt',exportText(),'text/plain');return}
  if(name==='download-json'){downloadFile('THRESHOLD_responses.json',JSON.stringify(exportObject(),null,2),'application/json');return}
+ if(name==='print-review'){window.print();return}
  if(name==='reset-open'){$('#resetDialog').showModal();return}
  if(name==='cancel-reset'){$('#resetDialog').close();return}
  if(name==='confirm-reset'){
@@ -797,7 +1068,8 @@ document.addEventListener('keydown',e=>{
  if(e.altKey&&e.key==='ArrowRight'&&state.view==='question'){e.preventDefault();next()}
  if(e.altKey&&e.key==='ArrowLeft'&&state.view==='question'){e.preventDefault();back()}
 });
-$('#importDialog').addEventListener('close',()=>{pendingImport=null;$('#importApply').disabled=true});
+$('#importDialog').addEventListener('close',()=>{pendingImport=null;pendingLocked=null;$('#importPass').value='';$('#importApply').disabled=true});
+$('#lockDialog').addEventListener('close',()=>{$('#lockPass').value='';$('#lockConfirm').value=''});
 render();
 </script>
 </body>

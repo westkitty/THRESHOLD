@@ -11,3 +11,6 @@ answers/
 # Default browser exports contain private participant responses
 *responses*.txt
 *responses*.json
+
+# Personal encrypted response backups
+*.thx
