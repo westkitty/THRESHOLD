@@ -7,3 +7,7 @@ answers/
 *answers*.txt
 *answers*.json
 *.personal.json
+
+# Default browser exports contain private participant responses
+*responses*.txt
+*responses*.json

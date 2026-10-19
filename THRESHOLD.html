@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#080608">
+<title>THRESHOLD — Four Rounds / Twenty-Five Questions</title>
+<style>
+:root{--bg:#080608;--ink:#f3edef;--muted:#a99a9d;--muted2:#73656c;--surface:#12090d;--surface2:#1c0d13;--scar:#49000f;--red:#d8002c;--hot:#ff1744;--rim:rgba(255,73,111,.23);--white-rim:rgba(255,255,255,.11);--panel:rgba(16,9,13,.92);--ease:cubic-bezier(.19,1,.22,1);--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--display:Impact,'Arial Narrow','Helvetica Neue',Arial,sans-serif;--body:'Helvetica Neue',Arial,sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:85px}
+body{margin:0;min-width:320px;color:var(--ink);font-family:var(--body);background:radial-gradient(ellipse at 92% -14%,#3d0014 0%,transparent 43%),radial-gradient(ellipse at -12% 79%,#1f0710 0%,transparent 34%),var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.18;background:repeating-linear-gradient(0deg,transparent 0,transparent 3px,rgba(255,255,255,.018) 4px,transparent 5px),repeating-linear-gradient(90deg,transparent 0,transparent 63px,rgba(255,255,255,.04) 64px);mask-image:linear-gradient(to bottom,#000,transparent 98%)}
+button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid #ff5977;outline-offset:3px}
+::selection{background:#eb0038;color:white}button:disabled{cursor:default;opacity:.33}
+.top-rule{height:4px;background:linear-gradient(90deg,var(--hot) 0 12%,#6e0020 12% 48%,#20000b 48% 100%);box-shadow:0 0 26px rgba(232,0,50,.25)}
+.mast{height:73px;position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:0 clamp(18px,4.1vw,76px);background:rgba(7,5,7,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--white-rim)}
+.wordmark{display:flex;gap:13px;align-items:center;background:none;border:0;color:var(--ink);padding:4px 0;letter-spacing:.08em;text-align:left}
+.logo-mark{width:30px;height:32px;display:grid;place-items:center;background:var(--red);color:#fff;clip-path:polygon(0 0,100% 0,76% 100%,0 100%);font:900 17px var(--display)}
+.logo-type{font:800 19px var(--display);letter-spacing:.16em}.logo-type span{color:var(--hot)}
+.mast-center{font:10px var(--mono);color:var(--muted);letter-spacing:.16em;white-space:nowrap}
+.mast-right{display:flex;gap:18px;align-items:center}
+.mast-step{color:var(--ink);font:12px var(--mono);white-space:nowrap}.mast-step strong{font-size:16px;color:var(--hot)}
+.save-toggle{background:transparent;color:var(--muted);border:1px solid var(--white-rim);padding:10px 13px;letter-spacing:.06em;font:10px var(--mono);transition:background .2s,border .2s,color .2s;white-space:nowrap}
+.save-toggle:hover,.save-toggle[aria-pressed=true]{border-color:var(--hot);color:#fff;background:#300412}
+.save-dot{display:inline-block;width:6px;height:6px;margin-right:7px;border-radius:50%;background:#66575e;vertical-align:middle}.save-toggle[aria-pressed=true] .save-dot{background:var(--hot);box-shadow:0 0 9px var(--hot)}
+#screen{position:relative;z-index:1;min-height:calc(100dvh - 77px)}.stage-enter{animation:slam-in .44s var(--ease) both}
+@keyframes slam-in{0%{opacity:.25;transform:translate3d(0,24px,0) scale(.984);filter:blur(8px)}45%{opacity:1;filter:blur(0)}100%{opacity:1;transform:none;filter:none}}
+@keyframes slash{from{transform:scaleX(0);transform-origin:left}to{transform:scaleX(1);transform-origin:left}}
+@keyframes drive{from{transform:translateX(-8%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes radar{from{transform:rotate(-45deg)}to{transform:rotate(315deg)}}
+.overline{display:flex;align-items:center;gap:12px;font:11px var(--mono);letter-spacing:.18em;color:var(--hot);text-transform:uppercase}
+.overline:before{content:"";display:inline-block;width:20px;height:2px;background:var(--hot)}
+.tag{display:inline-flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--rim);color:#d6aeb7;background:#230811;font:10px var(--mono);letter-spacing:.13em;text-transform:uppercase}
+.btn{display:inline-flex;align-items:center;justify-content:space-between;gap:22px;border:1px solid var(--rim);padding:17px 21px;background:#1e1016;color:var(--ink);text-transform:uppercase;letter-spacing:.12em;font:700 12px var(--mono);min-height:54px;text-align:left;transition:transform .22s var(--ease),box-shadow .22s,border-color .2s,background .2s}
+.btn:hover{border-color:var(--hot);background:#3b081a;box-shadow:0 9px 24px rgba(180,0,38,.16);transform:translateY(-2px)}.btn:active{transform:translateY(2px) scale(.985)}
+.btn-primary{background:var(--red);color:#fff;border-color:var(--hot);box-shadow:8px 8px 0 rgba(78,0,21,.58)}
+.btn-primary:hover{background:#f10034;box-shadow:12px 12px 0 rgba(100,0,26,.48)}.btn-quiet{background:transparent;border-color:var(--white-rim);color:var(--muted)}
+.btn-small{padding:10px 13px;min-height:38px;font-size:10px;gap:9px}
+.arrow{font-size:21px;line-height:.7;font-family:Arial,sans-serif;font-weight:300}
+.hairline{height:1px;background:linear-gradient(90deg,var(--hot),rgba(255,255,255,.08),transparent)}
+/* COVER */
+.landing{max-width:1680px;margin:0 auto;padding:clamp(26px,6vw,92px) clamp(18px,6.2vw,100px) 42px;overflow:hidden}
+.cover-grid{position:relative;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);align-items:center;min-height:min(72vh,680px)}
+.cover-copy{position:relative;z-index:2;padding-bottom:24px}.cover-overline{margin-bottom:25px}
+.cover-title{position:relative;margin:0 0 31px;font:900 clamp(95px,15.3vw,253px)/.77 var(--display);font-stretch:condensed;letter-spacing:-.048em;text-transform:uppercase;text-wrap:nowrap;transform:scaleX(.94);transform-origin:left}
+.cover-title:after{content:"";display:block;width:clamp(80px,9vw,140px);height:9px;background:var(--red);margin:32px 0 0;box-shadow:32px 0 0 #3e0715}
+.cover-title em{font-style:normal;color:var(--hot)}
+.cover-explainer{max-width:580px;font-size:clamp(20px,2.2vw,30px);line-height:1.23;letter-spacing:-.035em;font-weight:600;margin:0 0 15px}
+.cover-instruction{font:12px/1.8 var(--mono);letter-spacing:.03em;color:var(--muted);margin:0 0 39px}
+.cover-actions{display:flex;align-items:center;gap:20px;flex-wrap:wrap}.cover-actions .btn{min-width:250px}
+.micro-label{font:10px/1.6 var(--mono);color:var(--muted2);letter-spacing:.1em;text-transform:uppercase}
+.cover-graphic{position:relative;min-height:520px;align-self:stretch;display:grid;place-items:center;overflow:visible}
+.halo{position:absolute;width:min(44vw,540px);aspect-ratio:1;border:1px solid rgba(242,0,49,.22);border-radius:50%;box-shadow:inset 0 0 76px rgba(112,0,26,.12),0 0 100px rgba(112,0,26,.10)}
+.halo:before,.halo:after{content:"";position:absolute;inset:11%;border:1px dashed rgba(255,40,80,.31);border-radius:50%}
+.halo:after{inset:25%;border-style:solid;border-color:rgba(255,40,80,.38);box-shadow:0 0 50px rgba(153,0,35,.15)}
+.orbit-cross{width:88%;height:1px;background:linear-gradient(90deg,transparent,#ad1640,transparent);position:absolute;transform:rotate(-31deg)}
+.orbit-cross:after{content:"";position:absolute;left:50%;top:-250px;height:500px;width:1px;background:linear-gradient(180deg,transparent,#ad1640,transparent)}
+.halo-center{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;width:210px;height:210px;background:radial-gradient(circle,#410716 0,#13050a 65%,transparent 72%);border-radius:50%;text-align:center}
+.halo-center .num{font:900 125px/.82 var(--display);letter-spacing:-.065em;color:#fff;text-shadow:0 0 58px rgba(233,0,45,.29)}
+.halo-center .num-label{font:10px var(--mono);letter-spacing:.25em;color:var(--hot);margin-top:14px}
+.halo-small{position:absolute;font:10px var(--mono);letter-spacing:.18em;color:#9b5365;text-transform:uppercase}
+.halo-small.a{top:10%;left:15%}.halo-small.b{bottom:13%;right:6%}.halo-small.c{right:2%;top:40%;writing-mode:vertical-rl}
+.cover-divider{margin-top:34px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:30px;color:var(--muted2);font:10px var(--mono);letter-spacing:.16em}
+.cover-divider:before{content:"";height:1px;background:linear-gradient(90deg,#a7193f,#25121a)}
+.round-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--white-rim);border-bottom:1px solid var(--white-rim);margin-top:22px}
+.round-tile{display:flex;gap:12px;align-items:center;text-align:left;padding:20px 16px;background:transparent;color:var(--ink);border:0;border-right:1px solid var(--white-rim);transition:background .25s}.round-tile:last-child{border-right:0}
+.round-tile:hover{background:#210a12}.round-tile .rnum{font:700 32px var(--display);color:var(--hot)}
+.round-tile strong{font:12px var(--mono);letter-spacing:.07em;display:block}.round-tile small{font:10px var(--mono);line-height:1.7;color:var(--muted);display:block;margin-top:5px}
+/* ROUND INTERLUDE */
+.interlude{position:relative;min-height:calc(100dvh - 77px);display:grid;grid-template-columns:1fr .8fr;align-items:center;gap:5vw;overflow:hidden;padding:clamp(32px,6vw,98px) clamp(22px,7vw,125px)}
+.interlude:after{content:"";position:absolute;right:-8vw;top:-60px;width:27vw;height:140vh;background:linear-gradient(110deg,transparent 10%,rgba(210,0,44,.10) 30%,rgba(210,0,44,.32) 31%,rgba(210,0,44,.08) 45%,transparent 45%);transform:skewX(-12deg);pointer-events:none}
+.interlude-body{z-index:1}.interlude-num{font:900 clamp(160px,29vw,470px)/.76 var(--display);letter-spacing:-.07em;color:transparent;-webkit-text-stroke:1px rgba(255,32,75,.55);opacity:.9;text-align:right}
+.interlude-title{font:900 clamp(72px,9vw,160px)/.83 var(--display);letter-spacing:-.04em;margin:28px 0;text-transform:uppercase;max-width:670px}
+.interlude-title span{color:var(--hot)}.interlude-subtitle{color:var(--muted);font:13px/1.8 var(--mono);letter-spacing:.04em;margin:0 0 35px;max-width:480px}
+.interlude .tag{margin-top:28px}
+/* QUESTION WORKBENCH */
+.workbench{display:grid;grid-template-columns:275px minmax(0,1fr);max-width:1660px;margin:0 auto;min-height:calc(100dvh - 77px)}
+.rail{align-self:stretch;border-right:1px solid var(--white-rim);background:linear-gradient(180deg,rgba(37,7,16,.66),rgba(6,4,6,.68) 42%);padding:34px 23px;position:relative}
+.rail-sticky{position:sticky;top:108px}.rail-title{font:10px var(--mono);letter-spacing:.2em;color:var(--muted);margin:0 0 21px}
+.rail-progress{height:4px;background:#361923;overflow:hidden}.rail-progress span{display:block;height:100%;background:var(--hot);transition:width .5s var(--ease);box-shadow:0 0 12px rgba(255,30,73,.5)}
+.rail-figures{display:flex;justify-content:space-between;margin:10px 0 28px;font:10px var(--mono);color:var(--muted)}
+.rail-round{padding:17px 0;border-top:1px solid var(--white-rim)}
+.rail-round-head{display:flex;gap:10px;align-items:baseline;margin-bottom:10px}
+.rail-round-head .roman{font:700 20px var(--display);color:#916276}.rail-round.current .roman{color:var(--hot)}
+.rail-round-head strong{font:11px var(--mono);text-transform:uppercase;letter-spacing:.06em}.rail-round-head small{display:block;color:var(--muted);margin-top:5px;font:10px var(--mono)}
+.dot-grid{display:flex;flex-wrap:wrap;gap:6px}
+.qdot{width:25px;height:26px;padding:0;display:grid;place-items:center;font:9px var(--mono);color:#83737c;background:#1b1015;border:1px solid rgba(255,255,255,.08);transition:background .18s,border .18s,transform .18s}
+.qdot:hover{border-color:var(--hot);color:#fff;transform:translateY(-2px)}.qdot.active{background:var(--hot);border-color:var(--hot);color:#fff}.qdot.done:not(.active){color:#ff9cac;border-color:#91253e;background:#3a0b1b}
+.rail-endnote{margin-top:30px;font:10px/1.7 var(--mono);color:var(--muted2);letter-spacing:.06em}
+.question-stage{min-width:0;display:flex;flex-direction:column}
+.question-topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:24px clamp(20px,5vw,83px) 0;font:10px var(--mono);letter-spacing:.17em;color:var(--muted);text-transform:uppercase}
+.question-topbar strong{color:var(--hot);font-weight:600}.question-topbar .q-fraction{color:var(--ink);white-space:nowrap}
+.question-topbar .q-fraction b{font:800 19px var(--display);color:var(--hot);padding:0 4px}
+.question-body{position:relative;width:100%;max-width:1140px;padding:24px clamp(20px,5vw,83px) 25px;margin:0 auto;flex:1}
+.q-ghost{position:absolute;right:clamp(20px,5vw,83px);top:-16px;font:900 clamp(120px,19vw,280px)/1 var(--display);color:rgba(233,9,63,.045);pointer-events:none}
+.section-index{display:flex;align-items:center;gap:14px;color:var(--hot);font:11px var(--mono);letter-spacing:.16em;text-transform:uppercase;margin:19px 0 22px}
+.section-index:before{content:"";width:29px;height:3px;background:var(--hot)}
+.q-heading{position:relative;z-index:1;max-width:840px;margin:0 0 37px;font-size:clamp(27px,3.4vw,49px);font-weight:750;line-height:1.16;letter-spacing:-.045em;text-wrap:pretty;overflow-wrap:anywhere}
+.q-heading:after{content:"";display:block;width:50px;height:4px;background:var(--hot);margin:27px 0 0}
+.instrument{position:relative;z-index:1;border:1px solid var(--rim);background:linear-gradient(145deg,rgba(59,11,26,.65),rgba(13,8,12,.93) 70%);margin-bottom:18px}
+.instrument-top{display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--white-rim);padding:12px 17px}
+.instrument-label{font:10px var(--mono);letter-spacing:.18em;color:#ee839d;text-transform:uppercase}.instrument-top .ticker{margin-left:auto;color:#7a5864;font:9px var(--mono);letter-spacing:.1em}
+.instrument-inner{padding:22px 22px 24px}
+.chip-row{display:flex;gap:8px;flex-wrap:wrap}.chip{background:#140e11;border:1px solid #4c2935;color:#c7b8be;min-height:41px;padding:10px 13px;font:11px var(--mono);letter-spacing:.04em;transition:all .2s;text-align:left}
+.chip:hover{background:#3a1020;border-color:#ab3454;color:#fff}.chip[aria-pressed=true]{border-color:var(--hot);background:var(--red);color:#fff;box-shadow:inset 3px 0 0 #fff}
+.scale-boxes{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px}
+.scale-box{min-width:0}.scale-label{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:15px;text-transform:uppercase;font:11px var(--mono);color:#e5b9c5;letter-spacing:.07em}
+.scale-value{font:800 33px/1 var(--display);color:var(--ink);letter-spacing:-.025em}
+.scale-box input[type=range]{width:100%;height:7px;appearance:none;cursor:pointer;border-radius:0;outline-offset:8px;background:linear-gradient(90deg,var(--hot) var(--amount),#482532 var(--amount))}
+.scale-box input[type=range]::-webkit-slider-thumb{appearance:none;width:21px;height:26px;background:#f4eaf0;border:5px solid var(--red);box-shadow:0 0 0 2px #4b071b;clip-path:polygon(0 0,100% 0,100% 70%,50% 100%,0 70%)}
+.scale-box input[type=range]::-moz-range-thumb{width:18px;height:18px;background:#f4eaf0;border:4px solid var(--red);border-radius:0}
+.scale-ends{display:flex;justify-content:space-between;gap:14px;margin-top:12px;font:9px var(--mono);color:var(--muted);letter-spacing:.05em}
+.control-hint{margin:14px 0 0;color:#907c85;font:10px/1.6 var(--mono)}
+.response-block{position:relative;z-index:1;border:1px solid var(--white-rim);background:rgba(7,6,8,.68);margin-top:17px}
+.response-header{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid var(--white-rim);padding:13px 18px}
+.response-header label{color:var(--ink);font:11px var(--mono);letter-spacing:.16em;font-weight:700}.response-header span{font:9px var(--mono);color:var(--muted2);letter-spacing:.1em}
+.answer-area{display:block;width:100%;min-height:142px;max-height:60vh;resize:vertical;border:0;outline:none!important;background:transparent;color:#f4e8ee;padding:23px 19px;font:17px/1.7 var(--body);letter-spacing:.005em;overflow-wrap:anywhere}
+.answer-area::placeholder{color:#66545c;opacity:1}.answer-area:focus{background:rgba(66,9,27,.13);box-shadow:inset 4px 0 0 var(--hot)}
+.response-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 18px;border-top:1px solid var(--white-rim);font:10px var(--mono);letter-spacing:.07em;color:var(--muted2)}
+.response-footer span:last-child{color:#a88c99}
+.question-actions{position:sticky;bottom:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px clamp(20px,5vw,83px) calc(16px + env(safe-area-inset-bottom));background:linear-gradient(0deg,rgba(8,6,8,.99) 74%,rgba(8,6,8,.77));border-top:1px solid var(--white-rim)}
+.action-note{color:#83676f;font:10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em}
+/* LIMITS */
+.limits-intro{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:20px 22px 12px}
+.limits-title{font:800 clamp(34px,4vw,54px)/1 var(--display);letter-spacing:.015em;margin:0}.limits-title em{font-style:normal;color:var(--hot)}
+.limit-stats{display:flex;gap:19px;align-items:center;flex-wrap:wrap}.limit-stat{display:flex;flex-direction:column;gap:4px;color:#cbb1b9;font:9px var(--mono);letter-spacing:.11em}
+.limit-stat b{font:800 29px var(--display);color:#fff}
+.limit-toolbar{padding:16px 20px;display:flex;flex-wrap:wrap;gap:10px;border-top:1px solid var(--white-rim);border-bottom:1px solid var(--white-rim)}
+.field-input,.field-select{border:1px solid #643143;min-height:44px;border-radius:0;background:#100b0e;color:var(--ink);padding:10px 13px;font:12px var(--mono);min-width:0}
+.field-input::placeholder{color:#8a737c}.field-input:focus,.field-select:focus{border-color:var(--hot)}
+.field-input{flex:1;min-width:190px}.field-select{max-width:235px;flex:1}
+.limit-info{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 20px;background:rgba(88,7,30,.25);border-bottom:1px solid var(--white-rim);font:10px var(--mono);color:#ad8795;letter-spacing:.07em}.limit-info strong{color:#ff5c7e}.limit-info span:last-child{white-space:nowrap}
+.limit-scroller{max-height:min(64vh,630px);overflow-y:auto;overscroll-behavior:contain;scrollbar-color:#9f1d42 #170e13;padding:14px 20px 18px}
+.limit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.limit-card{border:1px solid #482631;background:#100b0f;padding:12px 13px;min-width:0;transition:border .18s,background .18s;position:relative}
+.limit-card:hover{border-color:#88405a}.limit-card[data-status="HARD LIMIT"]{border-left:3px solid #ff294d;background:#210a12}.limit-card[data-status="FANTASY ONLY"]{border-left:3px solid #bd829c}.limit-card[data-status="COMFORTABLE"]{border-left:3px solid #d8a7b5}
+.limit-row{display:flex;justify-content:space-between;gap:7px;align-items:flex-start}.limit-index{font:9px var(--mono);color:#9d5166;white-space:nowrap;margin-top:3px}
+.limit-name{font:700 12px/1.5 var(--body);letter-spacing:.01em;overflow-wrap:anywhere;flex:1}
+.limit-category{margin:9px 0;color:#80626c;font:9px var(--mono);letter-spacing:.09em;text-transform:uppercase}
+.topic-status{width:100%;border:1px solid #55283a;background:#1e1117;color:#e8d8dd;padding:10px 11px;border-radius:0;font:10px var(--mono);letter-spacing:.05em}
+.limit-card[data-status="HARD LIMIT"] .topic-status{background:#75142e;border-color:#ff345b;color:#fff}
+.note-details{margin-top:10px;border-top:1px solid rgba(255,255,255,.07);padding-top:9px}
+.note-details summary{cursor:pointer;font:10px var(--mono);color:#af8795;letter-spacing:.05em;list-style:none}
+.note-details summary::-webkit-details-marker{display:none}.note-details summary:before{content:"+ ";font-size:14px;color:var(--hot)}
+.note-area{margin-top:12px;min-height:68px;max-width:100%;width:100%;resize:vertical;border:1px solid #542b3a;background:#0b080b;padding:11px;color:var(--ink);font:12px/1.5 var(--body)}
+.limit-empty{padding:40px 12px;color:var(--muted);text-align:center;font:12px/1.6 var(--mono)}
+.custom-title{padding:17px 20px 0;font:11px var(--mono);color:#db91a4;letter-spacing:.15em}
+.custom-form{display:flex;gap:8px;flex-wrap:wrap;padding:13px 20px 20px}.custom-form .btn{min-height:44px}
+.custom-actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}.custom-actions .btn{font:9px var(--mono)}
+/* REVIEW */
+.review{max-width:1320px;margin:0 auto;padding:clamp(26px,5vw,72px) clamp(18px,5vw,74px) 120px}
+.review-head{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end;border-bottom:1px solid var(--rim);padding-bottom:28px}
+.review-title{font:900 clamp(88px,12vw,182px)/.8 var(--display);letter-spacing:-.045em;margin:20px 0 0;text-transform:uppercase}
+.review-title span{color:var(--hot)}.review-sub{font:12px var(--mono);color:var(--muted);line-height:1.7;max-width:340px}
+.export-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:25px 0}.export-bar .btn-primary{min-width:245px}
+.review-statrow{display:flex;gap:13px;flex-wrap:wrap;margin-bottom:45px}.review-stat{padding:14px 19px;border-left:3px solid #b7193e;background:#1a0c13;min-width:155px;display:flex;gap:10px;align-items:center}
+.review-stat b{font:800 37px var(--display)}.review-stat span{font:10px/1.5 var(--mono);letter-spacing:.1em;color:#c399a7;text-transform:uppercase}
+.review-round{margin:36px 0 18px;padding-bottom:12px;border-bottom:1px solid var(--rim);display:flex;align-items:baseline;gap:14px}
+.review-round .num{font:800 39px var(--display);color:var(--hot)}.review-round h2{margin:0;font:700 14px var(--mono);letter-spacing:.14em}
+.review-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.review-item{border:1px solid var(--white-rim);background:rgba(17,9,13,.7);padding:19px;min-width:0}
+.review-item header{display:flex;justify-content:space-between;align-items:center;margin-bottom:17px}
+.review-item header span{color:var(--hot);font:12px var(--mono)}
+.inline-link{border:0;background:none;color:#e9a5b6;text-decoration:underline;text-underline-offset:4px;font:10px var(--mono);letter-spacing:.1em;padding:5px}
+.inline-link:hover{color:#fff}
+.review-q{font:700 15px/1.5 var(--body);margin:0 0 14px;white-space:pre-wrap;overflow-wrap:anywhere}
+.review-choice{display:inline-block;margin:0 5px 6px 0;background:#290e1a;border:1px solid #603246;color:#dba9ba;padding:6px 9px;font:10px var(--mono)}
+.review-answer{color:#d4c6cc;border-top:1px solid #35202a;padding-top:14px;margin-top:10px;white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.6 var(--body)}
+.review-answer.empty{color:#76646c;font-style:italic}.review-limits{border:1px solid var(--rim);background:#140910;padding:23px}
+.review-limits h3{margin:0 0 18px;font:800 40px var(--display)}.review-limit-row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--white-rim);padding:12px 0;font:12px/1.6 var(--body)}
+.review-limit-row .right{text-align:right;color:#ecacbf;font:10px var(--mono);white-space:nowrap}
+.review-limit-row small{display:block;color:#7c626f;font:11px/1.5 var(--body)}
+.review-preview{margin-top:30px;border:1px solid var(--white-rim);padding:16px;background:#0e090d}
+.review-preview summary{font:11px var(--mono);letter-spacing:.1em;cursor:pointer;color:#e4b7c4;padding:10px}
+.review-preview textarea{display:block;margin-top:13px;width:100%;min-height:260px;resize:vertical;color:var(--ink);background:#0c080a;border:1px solid #542b3a;padding:18px;font:11px/1.7 var(--mono)}
+.review-foot{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;border-top:1px solid var(--white-rim);margin-top:50px;padding-top:20px}
+.review-foot small{font:10px/1.6 var(--mono);color:var(--muted)}
+/* CONFIRM + CLIPBOARD DIALOGS */
+dialog{border:1px solid #ae3455;background:#120b10;color:var(--ink);padding:0;max-width:min(92vw,550px);width:100%;box-shadow:0 28px 100px #000}
+dialog::backdrop{background:rgba(0,0,0,.83);backdrop-filter:blur(8px)}
+.dialog-body{padding:28px}.dialog-body h2{font:800 46px/1 var(--display);margin:0 0 15px}.dialog-body p{color:var(--muted);font:14px/1.6 var(--body)}
+.dialog-actions{display:flex;gap:11px;flex-wrap:wrap;margin-top:22px}.dialog-text{width:100%;min-height:240px;background:#080608;border:1px solid #54313d;color:#fff;padding:12px;font:12px/1.5 var(--mono)}
+.toast{position:fixed;z-index:100;bottom:24px;right:24px;max-width:min(400px,calc(100vw - 36px));padding:15px 19px;background:#3a0919;border:1px solid var(--hot);box-shadow:0 15px 45px #000;color:#fff;font:12px/1.5 var(--mono);letter-spacing:.04em}
+.toast[hidden]{display:none}.hidden{display:none!important}
+.site-footer{border-top:1px solid var(--white-rim);display:flex;justify-content:space-between;gap:12px;padding:21px clamp(18px,4.1vw,76px);font:10px var(--mono);letter-spacing:.08em;color:#775e69;position:relative;z-index:1}
+.site-footer em{font-style:normal;color:#d45d7c}
+@media(min-width:1500px){.cover-title{font-size:245px}}
+@media(max-width:1120px){.cover-grid{grid-template-columns:1fr .48fr}.cover-title{font-size:clamp(92px,14vw,160px)}.cover-graphic{min-height:430px}.halo{width:360px}.halo-center{transform:scale(.75)}.rail{width:220px;padding:28px 15px}.workbench{grid-template-columns:220px minmax(0,1fr)}.mast-center{display:none}}
+@media(max-width:800px){.cover-grid{grid-template-columns:1fr;min-height:auto}.cover-graphic{display:none}.landing{padding-top:65px}.cover-title{font-size:clamp(86px,17vw,150px)}.round-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.round-tile:nth-child(2){border-right:0}.round-tile:nth-child(-n+2){border-bottom:1px solid var(--white-rim)}.interlude{grid-template-columns:1fr}.interlude-num{position:absolute;right:5vw;bottom:4vw;opacity:.25}.workbench{grid-template-columns:1fr}.rail{border-right:0;border-bottom:1px solid var(--white-rim);width:auto;padding:14px 20px 12px}.rail-sticky{position:static}.rail-title,.rail-figures,.rail-endnote,.rail-progress{display:none}.rail-rounds{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px}.rail-round{min-width:145px;flex:1;border-top:0;border-left:1px solid var(--white-rim);padding:3px 0 3px 10px}.rail-round-head{margin-bottom:8px}.dot-grid{gap:4px}.qdot{width:23px;height:23px}.question-body{padding-top:20px}.review-list{grid-template-columns:1fr}}
+@media(max-width:580px){.mast{height:66px;padding:0 14px;gap:8px}.logo-type{font-size:15px;letter-spacing:.12em}.logo-mark{width:26px;height:29px}.mast-step{display:none}.mast-right{gap:7px}.save-toggle{font-size:9px;padding:9px 8px;max-width:148px}.landing{padding:35px 19px}.cover-title{font-size:clamp(76px,16.8vw,110px);margin-top:40px}.cover-title:after{height:6px;margin-top:22px}.cover-explainer{font-size:22px}.cover-actions .btn{width:100%}.cover-divider{margin-top:52px}.round-tile{padding:15px 10px;gap:8px}.round-tile .rnum{font-size:27px}.round-tile strong{font-size:10px}.interlude{min-height:calc(100dvh - 66px);padding:35px 24px}.interlude-title{font-size:clamp(67px,14vw,100px)}.question-topbar{padding:22px 20px 0}.question-body{padding:13px 19px 20px}.q-heading{font-size:clamp(27px,7vw,40px);margin-bottom:24px}.instrument-inner{padding:17px 15px 19px}.instrument-top{padding:11px 15px}.response-header{padding:12px 13px}.answer-area{padding:18px 13px;font-size:16px;min-height:140px}.scale-boxes{grid-template-columns:1fr}.question-actions{padding:12px 14px calc(13px + env(safe-area-inset-bottom));gap:8px}.question-actions .btn{min-height:46px;padding:12px 10px;font-size:10px;gap:8px}.action-note{display:none}.limit-scroller{padding:13px;max-height:55vh}.limit-grid{grid-template-columns:1fr}.limits-intro,.limit-toolbar,.custom-title,.custom-form{padding-left:13px;padding-right:13px}.limits-title{font-size:37px}.limit-stats{gap:12px}.limit-stat b{font-size:22px}.field-select{max-width:100%;flex:1 1 130px}.review{padding:35px 17px 85px}.review-head{grid-template-columns:1fr}.review-title{font-size:clamp(82px,18vw,115px)}.export-bar .btn{flex:1 1 44%}.export-bar .btn-primary{flex:1 1 100%}.review-stat{min-width:120px}.site-footer{padding:18px;flex-direction:column}.toast{bottom:14px;right:14px}}
+@media(max-width:365px){.cover-title{font-size:71px}.logo-type{font-size:13px}.save-toggle{max-width:123px}.rail-round{min-width:128px}.question-actions .btn{font-size:9px}.response-header span{display:none}}
+@media(max-width:800px){.workbench{grid-template-columns:minmax(0,1fr);width:100%}.rail{min-width:0;max-width:100%;overflow:hidden}.rail-sticky,.rail-rounds{min-width:0;max-width:100%}.rail-rounds{width:100%}.question-stage,.question-body{min-width:0;max-width:100%}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}.stage-enter{filter:none!important;transform:none!important}}
+</style>
+</head>
+<body>
+<div class="top-rule" aria-hidden="true"></div>
+<header class="mast">
+<button class="wordmark" type="button" data-action="home" aria-label="THRESHOLD — return to start"><span class="logo-mark" aria-hidden="true">T</span><span class="logo-type">THRESH<span>OLD</span></span></button>
+<div class="mast-center">FOUR ROUNDS&nbsp; / &nbsp;TWENTY-FIVE QUESTIONS</div>
+<div class="mast-right"><span class="mast-step" id="mastStep">00 <span style="color:#78616b">/</span> 25</span><button class="save-toggle" data-action="toggle-save" id="saveToggle" type="button" aria-pressed="false"><span class="save-dot" aria-hidden="true"></span>SAVE ON DEVICE: OFF</button></div>
+</header>
+<main id="screen" aria-live="off"></main>
+<footer class="site-footer"><span>THRESHOLD <em>///</em> FOUR ROUNDS</span><span>LOCAL EXPERIENCE&nbsp; / &nbsp;ONE COMPLETE RECORD</span></footer>
+<dialog id="resetDialog" aria-labelledby="resetTitle"><div class="dialog-body"><div class="overline">CLEAR SESSION</div><h2 id="resetTitle">ERASE RESPONSES?</h2><p>This clears every answer, selection, and custom limit in this browser session, including locally saved answers.</p><div class="dialog-actions"><button class="btn btn-quiet" type="button" data-action="cancel-reset">KEEP RESPONSES</button><button class="btn btn-primary" type="button" data-action="confirm-reset">CLEAR EVERYTHING <span class="arrow">→</span></button></div></div></dialog>
+<dialog id="copyDialog" aria-labelledby="copyTitle"><div class="dialog-body"><div class="overline">MANUAL COPY</div><h2 id="copyTitle">YOUR COMPLETE RECORD.</h2><p>Your browser didn't allow automatic copying. Select the text below and copy it manually.</p><textarea id="manualCopy" class="dialog-text" readonly aria-label="Complete response text for manual copying"></textarea><div class="dialog-actions"><button class="btn btn-primary" type="button" data-action="select-manual">SELECT ALL TEXT <span class="arrow">↗</span></button><button class="btn btn-quiet" type="button" data-action="close-copy">CLOSE</button></div></div></dialog>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<script>
+
+'use strict';
+const QUESTIONS=[{"id":1,"section":"BASELINE EXPERIENCES","text":"What’s something you used to think was really far that you now consider to Be vanilla or baseline? Something you enjoy now. "},{"id":2,"section":"BASELINE EXPERIENCES","text":"What’s something you really like now that you think most folk would call extreme?"},{"id":3,"section":"BASELINE EXPERIENCES","text":"What do you consider to be the most extreme thing you’ve actually done (not just fantasized about)?"},{"id":4,"section":"BASELINE EXPERIENCES","text":"Have you ever had play go further in the moment than you thought it would beforehand? What happened during? after?"},{"id":5,"section":"SUPRISES AND SHIFTS","text":"What’s a kink or act you assumed you wouldn’t be into that ended up working for you?"},{"id":6,"section":"SUPRISES AND SHIFTS","text":"Has anything that used to turn you off eventually become a turn-on (or vice versa)?"},{"id":7,"section":"SUPRISES AND SHIFTS","text":"What’s something you only discovered you liked after trying it with a specific person or in a specific context?"},{"id":8,"section":"SUPRISES AND SHIFTS","text":"Is there anything that used to be a hard limit that softened over time?"},{"id":9,"section":"CURRENT EDGES","text":"What’s something you’re curious about but haven’t done yet?"},{"id":10,"section":"CURRENT EDGES","text":"What’s something you can talk about or watch but wouldn’t want to actually do?"},{"id":11,"section":"CURRENT EDGES","text":"Where’s the line between “intense but hot” and “too much” for you right now?"},{"id":12,"section":"CURRENT EDGES","text":"What’s a scenario that sounds extreme on paper but feels fine to you in practice?"},{"id":13,"section":"CURRENT EDGES","text":"What’s something relatively common that is actually a hard no for you?"},{"id":14,"section":"CONTEXT AND CONDITIONS","text":"Does your willingness to go further depend more on the person, the trust, the setting, or the specific act?"},{"id":15,"section":"CONTEXT AND CONDITIONS","text":"Have you ever done something extreme and then felt different about it afterward? Regret? "},{"id":16,"section":"CONTEXT AND CONDITIONS","text":"What’s something that only works for you under very specific conditions?"},{"id":17,"section":"CONTEXT AND CONDITIONS","text":"How do you usually figure out in the moment whether you want to keep going or stop? Or do you accept you're powerlessness?"},{"id":18,"section":"FANTASY VS REALITY","text":"What’s something that lives more in your head than in real life so far? "},{"id":19,"section":"FANTASY VS REALITY","text":"Is there a big gap between what you fantasize about and what you’ve actually tried?"},{"id":20,"section":"FANTASY VS REALITY","text":"What’s an extreme thing you’ve roleplayed or talked about that you have no interest in doing for real?"},{"id":21,"section":"FEAR AND POWER","text":"What’s a type of fear (abandonment, loss of control, physical threat, drugged, being watched, being ruined, etc.) that hits harder for you than others? "},{"id":22,"section":"FEAR AND POWER","text":"What’s something about power exchange that only works for you with a high level of trust or a specific person?"},{"id":23,"section":"FEAR AND POWER","text":"Have you ever actually experienced fear to a significant degree sexually? How did that go? Was it planned?"},{"id":24,"section":"FEAR AND POWER","text":"What’s the most control you’ve actually given up to someone and what made that possible?"},{"id":25,"section":"FEAR AND POWER","text":"What - specifically - do you consider to be your 'limits' with me today? Today and then once in person you will have the opportunity to declare them. And I will accept them or not - you'll find out in play."}];
+const ROUNDS=[
+ {n:'I',name:'BASELINE / TRANSFORMATION',short:'BASELINE',start:1,end:8,sub:'BASELINE EXPERIENCES / SUPRISES AND SHIFTS',strap:'THE OLD EDGE WAS NEVER PERMANENT.',count:'08'},
+ {n:'II',name:'CURRENT EDGES',short:'CURRENT EDGES',start:9,end:13,sub:'CURRENT EDGES',strap:'FIND THE LINE THAT EXISTS NOW.',count:'05'},
+ {n:'III',name:'CONDITIONS / FANTASY',short:'CONTEXT + FANTASY',start:14,end:20,sub:'CONTEXT AND CONDITIONS / FANTASY VS REALITY',strap:'SOME THINGS CHANGE WITH THE ROOM.',count:'07'},
+ {n:'IV',name:'FEAR / POWER',short:'FEAR / POWER',start:21,end:25,sub:'FEAR AND POWER',strap:'NAME IT. CLASSIFY IT. LEAVE NOTHING UNSAID.',count:'05'}
+];
+const STATUS=['HARD LIMIT','SOFT LIMIT','FANTASY ONLY','CURIOUS','EXPERIENCED','COMFORTABLE','UNSURE'];
+const GROUPS=[
+ {name:'AUTHORITY',topics:['Absolute obedience commands','Strict hierarchy','Ownership language','Objectification','Service protocols','Punishment roleplay','Loss-of-choice fantasy','Negotiated resistance scenes','Assigned identities and titles','Demanded silence']},
+ {name:'PSYCHOLOGY',topics:['Verbal degradation','Personal humiliation','Confession pressure','Abandonment-themed fantasy','Withholding praise','Threat-themed fiction','Interrogation roleplay','Controlled embarrassment','Psychological endurance','Impossible-choice fantasy']},
+ {name:'RESTRAINT / SENSATION',topics:['Hand restraints','Full-body immobilization','Blindfolding','Sensory deprivation','Confinement roleplay','Prolonged kneeling','Pain intensity','Impact boundaries','Visible marks and bruises','Biting and scratching']},
+ {name:'EXPOSURE / PRIVACY',topics:['Being watched by other adults','Exposure fantasy','Private recording','Group dynamics','Public persona and secrecy','Identity disclosure','Humiliation before others','Masking and anonymity']},
+ {name:'SCENARIOS',topics:['Captivity-themed roleplay','Chase and capture fiction','Interrupted-rest fantasy','Drugging-themed fantasy','Surveillance fantasy','Betrayal roleplay','Ruin-themed fiction','Control over communication']},
+ {name:'AFTERMATH',topics:['Aftercare expectations','Emotional rebound','Post-scene processing','Ongoing authority rituals']}
+];
+const TOPICS=GROUPS.flatMap((g,gi)=>g.topics.map((name,i)=>({id:'L'+String(TOPICS_SEQUENTIAL(gi,i)).padStart(2,'0'),name,category:g.name})));
+function TOPICS_SEQUENTIAL(gi,i){let x=i+1;for(let j=0;j<gi;j++)x+=GROUPS[j].topics.length;return x}
+const META={
+ 1:{kind:'scales',title:'THEN // NOW',scales:[['BEFORE','PAST PERCEIVED INTENSITY','LESS EXTREME','MORE EXTREME'],['NOW','CURRENT BASELINE','LESS EXTREME','MORE EXTREME']]},
+ 2:{kind:'scales',title:'OUTSIDE PERSPECTIVE',scales:[['OTHERS','PERCEIVED EXTREMITY','LOW','EXTREME']]},
+ 3:{kind:'chips',title:'EXPERIENCE CONTEXT',mode:'multi',items:['ONE-ON-ONE','WITH OTHERS','SOLO','SPECIFIC SETTING','OTHER']},
+ 4:{kind:'chips',title:'AFTERWARD',mode:'multi',items:['SURPRISED','POSITIVE','MIXED','DIFFICULT','STILL PROCESSING']},
+ 5:{kind:'scales',title:'SURPRISE FACTOR',scales:[['SURPRISE','HOW UNEXPECTED WAS IT?','NOT AT ALL','COMPLETELY']]},
+ 6:{kind:'chips',title:'THE DIRECTION OF THE SHIFT',mode:'single',items:['TURNED ONTO IT','TURNED OFF IT','BOTH','STILL CHANGING']},
+ 7:{kind:'chips',title:'WHAT MADE THE DIFFERENCE?',mode:'multi',items:['THE PERSON','THE TRUST','THE SETTING','THE MOMENT','THE ACT']},
+ 8:{kind:'chips',title:'WHERE THE LIMIT WENT',mode:'single',items:['SOFTENED','STAYED FIRM','SHIFTED BACK','UNSURE']},
+ 9:{kind:'scales',title:'CURIOSITY METER',scales:[['CURIOSITY','INTEREST RIGHT NOW','LOW','HIGH']]},
+ 10:{kind:'chips',title:'WHAT STAYS AT A DISTANCE?',mode:'multi',items:['TALK ABOUT IT','WATCH IT','IMAGINE IT','NOT IN REAL LIFE']},
+ 11:{kind:'scales',title:'YOUR CURRENT EDGE',scales:[['EDGE','WHERE DOES IT TURN?','INTENSE BUT HOT','TOO MUCH']]},
+ 12:{kind:'scales',title:'PAPER // PRACTICE',scales:[['PAPER','INTENSITY ON PAPER','LOW','EXTREME'],['PRACTICE','INTENSITY IN PRACTICE','LOW','EXTREME']]},
+ 13:{kind:'chips',title:'THE HARD NO',mode:'multi',items:['PHYSICAL','PSYCHOLOGICAL','SETTING','SPECIFIC ACT','OTHER']},
+ 14:{kind:'scales',title:'WHAT CARRIES THE MOST WEIGHT?',scales:[['PERSON','THE PERSON','LESS','MORE'],['TRUST','THE TRUST','LESS','MORE'],['SETTING','THE SETTING','LESS','MORE'],['ACT','THE SPECIFIC ACT','LESS','MORE']]},
+ 15:{kind:'chips',title:'AFTER THE FACT',mode:'multi',items:['SATISFIED','REGRET','MIXED','SURPRISED','DIFFICULT TO NAME']},
+ 16:{kind:'chips',title:'DEPENDENT CONDITIONS',mode:'multi',items:['SPECIFIC PERSON','SPECIFIC PLACE','TRUST LEVEL','TIMING','SITUATION']},
+ 17:{kind:'chips',title:'IN THE MOMENT',mode:'multi',items:['WORDS','PHYSICAL RESPONSE','A SIGNAL','PAUSE','OTHER']},
+ 18:{kind:'chips',title:'WHERE IT LIVES',mode:'multi',items:['IMAGINATION','DISCUSSION','ROLEPLAY','UNEXPLORED']},
+ 19:{kind:'scales',title:'THE DISTANCE',scales:[['FANTASY','FANTASY INTENSITY','LOW','EXTREME'],['EXPERIENCE','LIVED INTENSITY','LOW','EXTREME']]},
+ 20:{kind:'chips',title:'FICTION / REALITY',mode:'multi',items:['ROLEPLAYED','TALKED ABOUT','IMAGINED','NOT FOR REAL LIFE']},
+ 21:{kind:'chips',title:'FEAR THEMES',mode:'multi',items:['ABANDONMENT','LOSS OF CONTROL','PHYSICAL THREAT','DRUGGED','BEING WATCHED','BEING RUINED','OTHER']},
+ 22:{kind:'scales',title:'THE TRUST THRESHOLD',scales:[['TRUST','HOW HIGH IS THE THRESHOLD?','LOW','HIGH']]},
+ 23:{kind:'chips',title:'THE FEAR WAS',mode:'single',items:['PLANNED','UNPLANNED','BOTH','HAS NOT OCCURRED','UNSURE']},
+ 24:{kind:'scales',title:'THE DEGREE OF CONTROL',scales:[['CONTROL','HOW MUCH DID YOU GIVE UP?','A LITTLE','A GREAT DEAL']]},
+ 25:{kind:'limits',title:'LIMITS MATRIX'}
+};
+if(QUESTIONS.length!==25||TOPICS.length!==50)throw Error('Source data count invariant failed');
+const STORAGE_KEY='threshold.session.1';
+function newState(){return{view:'intro',current:1,pendingRound:0,answers:{},limits:{},custom:[],autosave:false,filter:{query:'',category:'ALL',status:'ALL'},editCustom:null}}
+function retrieveState(){
+ try{
+  const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return null;
+  const data=JSON.parse(raw);
+  if(!data||data.autosave!==true||!data.answers||!data.limits)return null;
+  return {...newState(),...data,view:'intro',pendingRound:0,filter:{query:'',category:'ALL',status:'ALL'},editCustom:null,custom:Array.isArray(data.custom)?data.custom:[]};
+ }catch(e){return null}
+}
+let state=retrieveState()||newState(),toastTimer=null;
+const $=(s,root=document)=>root.querySelector(s);
+function esc(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function two(i){return String(i).padStart(2,'0')}
+function roman(index){return ROUNDS[index].n}
+function roundIndex(q){return ROUNDS.findIndex(r=>q>=r.start&&q<=r.end)}
+function answer(id){if(!state.answers[id])state.answers[id]={text:'',chosen:[],values:{}};return state.answers[id]}
+function getLimit(id){if(!state.limits[id])state.limits[id]={status:'',note:''};return state.limits[id]}
+function allLimits(){return TOPICS.concat(state.custom.map(c=>({id:c.id,name:c.name,category:'CUSTOM',custom:true})))}
+function isAnswered(q){const a=state.answers[q.id];if(q.id===25&&(state.custom.length>0||Object.values(state.limits).some(l=>l&&(l.status||(l.note||'').trim()))))return true;return !!a&&(a.text.trim()!==''||a.chosen.length>0||Object.keys(a.values).length>0)}
+function answeredCount(){return QUESTIONS.filter(isAnswered).length}
+function persist(){
+ if(!state.autosave)return;
+ try{localStorage.setItem(STORAGE_KEY,JSON.stringify({autosave:true,answers:state.answers,limits:state.limits,custom:state.custom,view:'intro'}))}
+ catch(e){state.autosave=false;refreshHeader();toast('Device saving is unavailable in this browser. Answers remain in this session.')}
+}
+function enableSave(){
+ if(state.autosave){state.autosave=false;try{localStorage.removeItem(STORAGE_KEY)}catch(e){};refreshHeader();toast('Device saving switched off.');return}
+ state.autosave=true;
+ try{localStorage.setItem(STORAGE_KEY,JSON.stringify({autosave:true,answers:state.answers,limits:state.limits,custom:state.custom}))}
+ catch(e){state.autosave=false;toast('This browser does not permit storage for local files.');}
+ refreshHeader();
+ if(state.autosave)toast('Responses will be saved in this browser.');
+}
+function refreshHeader(){
+ const step=state.view==='intro'?0:state.view==='round'?ROUNDS[state.pendingRound].start-1:state.view==='review'?25:state.current;
+ $('#mastStep').innerHTML=`<strong>${two(step)}</strong> / 25`;
+ const b=$('#saveToggle');b.setAttribute('aria-pressed',state.autosave?'true':'false');b.innerHTML=`<span class="save-dot" aria-hidden="true"></span>SAVE ON DEVICE: ${state.autosave?'ON':'OFF'}`;
+}
+function toast(msg){
+ const t=$('#toast');t.textContent=msg;t.hidden=false;
+ clearTimeout(toastTimer);toastTimer=setTimeout(()=>{t.hidden=true},3800);
+}
+function navigate(q,{gate=false}={}){
+ const id=Math.max(1,Math.min(25,Number(q)||1));const newRound=roundIndex(id);
+ if(gate&&ROUNDS[newRound].start===id){state.pendingRound=newRound;state.view='round'}
+ else {state.current=id;state.view='question'}
+ render();
+}
+function next(){
+ if(state.view==='question'){
+  if(state.current===25){state.view='review';render();return}
+  navigate(state.current+1,{gate:true});
+ }
+}
+function back(){
+ if(state.view==='question'){
+  if(state.current===1){state.view='intro';render();return}
+  navigate(state.current-1);
+ }else if(state.view==='review'){navigate(25)}
+ else if(state.view==='round'){state.view='intro';render()}
+}
+function render(){
+ refreshHeader();
+ const screen=$('#screen');
+ let html='';
+ if(state.view==='intro')html=renderIntro();
+ else if(state.view==='round')html=renderInterlude();
+ else if(state.view==='review')html=renderReview();
+ else html=renderQuestion(state.current);
+ screen.innerHTML=`<div class="stage-enter">${html}</div>`;
+ if(state.view==='review'){const pre=$('#exportPreview');if(pre)pre.value=exportText()}
+ window.scrollTo({top:0,behavior:'instant'});
+}
+function renderIntro(){
+ return `<section class="landing">
+  <div class="cover-grid">
+   <div class="cover-copy">
+    <div class="overline cover-overline">EXPERIENCE / INTENSITY / EDGES</div>
+    <h1 class="cover-title">THRESH<em>O</em>LD</h1>
+    <p class="cover-explainer">You are going to give me an understanding of where your experience threshold is.</p>
+    <p class="cover-instruction">This will occur across four rounds.<br>Don't think too hard about it - respond reflexively.</p>
+    <div class="cover-actions"><button class="btn btn-primary" type="button" data-action="start">BEGIN / FIRST ROUND <span class="arrow">↗</span></button><span class="micro-label">25 QUESTIONS<br>FOUR ROUNDS<br>ONE COMPLETE RECORD</span></div>
+   </div>
+   <div class="cover-graphic" aria-hidden="true"><div class="halo"></div><div class="orbit-cross"></div><div class="halo-center"><span class="num">25</span><span class="num-label">INTERROGATIONS</span></div><div class="halo-small a">POSITION / UNKNOWN</div><div class="halo-small b">BOUNDARY / IN FLUX</div><div class="halo-small c">YOU ARE HERE — 00/25</div></div>
+  </div>
+  <div class="cover-divider">FOUR ROUNDS / SELECT ONE TO ENTER</div>
+  <div class="round-strip">${ROUNDS.map((r,i)=>`<button type="button" class="round-tile" data-action="open-round" data-index="${i}"><span class="rnum">${two(i+1)}</span><span><strong>${esc(r.short)}</strong><small>${r.count} QUESTIONS&nbsp; ↗</small></span></button>`).join('')}</div>
+ </section>`;
+}
+function renderInterlude(){
+ const r=ROUNDS[state.pendingRound],i=state.pendingRound;
+ return `<section class="interlude"><div class="interlude-body">
+ <div class="overline">ROUND ${two(i+1)} / FOUR</div>
+ <div class="tag">${r.count} QUESTIONS INSIDE</div>
+ <h1 class="interlude-title">${esc(r.name.replace(' / ','<br> / ')).replace('&lt;br&gt;','<br>')}</h1>
+ <p class="interlude-subtitle">${esc(r.strap)}<br><span style="color:#a77787">${esc(r.sub)}</span></p>
+ <button class="btn btn-primary" type="button" data-action="enter-round">ENTER ROUND ${r.n} <span class="arrow">↗</span></button>
+ <div style="margin-top:17px"><button type="button" data-action="home" class="inline-link">RETURN TO INDEX</button></div>
+ </div><div class="interlude-num" aria-hidden="true">${two(i+1)}</div></section>`;
+}
+function renderRail(id){
+ const total=answeredCount();
+ return `<aside class="rail" aria-label="Question navigator"><div class="rail-sticky">
+ <p class="rail-title">INDEX / FOUR ROUNDS</p><div class="rail-progress"><span style="width:${total/25*100}%"></span></div>
+ <div class="rail-figures"><span>${total} ANSWERED</span><span>25 TOTAL</span></div>
+ <nav class="rail-rounds" aria-label="Jump to a question">
+ ${ROUNDS.map((r,i)=>`<div class="rail-round ${i===roundIndex(id)?'current':''}"><div class="rail-round-head"><span class="roman">${r.n}</span><span><strong>${esc(r.short)}</strong><small>${two(r.start)} — ${two(r.end)}</small></span></div><div class="dot-grid">${QUESTIONS.filter(q=>q.id>=r.start&&q.id<=r.end).map(q=>`<button type="button" class="qdot ${q.id===id?'active':isAnswered(q)?'done':''}" data-action="jump" data-q="${q.id}" title="Question ${two(q.id)}${isAnswered(q)?' — answered':''}" aria-label="Question ${q.id}, ${isAnswered(q)?'answered':'unanswered'}" ${q.id===id?'aria-current="step"':''}>${two(q.id)}</button>`).join('')}</div></div>`).join('')}
+ </nav><div class="rail-endnote">EACH ANSWER HELD IN THIS SESSION.<br>MOVE BACK. RECONSIDER. CONTINUE.</div>
+ </div></aside>`;
+}
+function renderQuestion(id){
+ const q=QUESTIONS.find(x=>x.id===id),r=ROUNDS[roundIndex(id)],a=answer(id);
+ return `<div class="workbench">${renderRail(id)}<div class="question-stage">
+ <div class="question-topbar"><span><strong>ROUND ${r.n}</strong> &nbsp;/&nbsp; ${esc(r.name)}</span><span class="q-fraction"><b>${two(id)}</b> / 25</span></div>
+ <div class="question-body">
+ <div class="q-ghost" aria-hidden="true">${two(id)}</div>
+ <div class="section-index">${esc(q.section)}</div>
+ <h1 class="q-heading" id="activeQuestion">${esc(q.text)}</h1>
+ <section class="instrument" aria-label="Question ${id} contextual controls">
+ <div class="instrument-top"><div class="instrument-label">${esc(META[id].title)}</div><span class="ticker">INTERACTIVE / OPTIONAL</span></div>
+ ${id===25?renderLimits():renderControl(id)}
+ </section>
+ <section class="response-block"><div class="response-header"><label for="answerText">YOUR RESPONSE</label><span>OPEN FIELD / ${two(id)}</span></div>
+ <textarea id="answerText" class="answer-area" data-answer="${id}" rows="4" placeholder="Type here. Take the space you need." spellcheck="true">${esc(a.text)}</textarea>
+ <div class="response-footer"><span id="wordCount">${a.text.trim()?a.text.trim().split(/\s+/).length:0} WORDS</span><span>NOTHING IS SENT</span></div></section>
+ </div>
+ <nav class="question-actions" aria-label="Question navigation"><button type="button" class="btn btn-quiet" data-action="back">← BACK</button><span class="action-note">QUESTION ${two(id)} / 25</span><button type="button" class="btn btn-primary" data-action="next">${id===25?'REVIEW ALL ANSWERS':'NEXT QUESTION'} <span class="arrow">↗</span></button></nav>
+ </div></div>`;
+}
+
+function renderControl(id){
+ const m=META[id],a=answer(id),exists=(a.chosen.length>0||Object.keys(a.values).length>0);
+ if(m.kind==='chips'){
+  return `<div class="instrument-inner"><div class="chip-row" role="group" aria-label="${esc(m.title)}">
+  ${m.items.map(value=>`<button type="button" class="chip" data-action="chip" data-q="${id}" data-value="${esc(value)}" aria-pressed="${a.chosen.includes(value)}">${esc(value)}</button>`).join('')}
+  </div><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:15px"><p class="control-hint" style="margin:0">${m.mode==='multi'?'SELECT ALL THAT APPLY.':'SELECT ONE.'} ADD DETAIL BELOW.</p><button class="inline-link" type="button" data-action="clear-control" data-q="${id}" ${exists?'':'disabled'}>CLEAR SELECTION</button></div></div>`;
+ }
+ const grid=m.scales.map(([key,label,min,max])=>{
+  const rawValue=a.values[key],value=rawValue===undefined?5:Number(rawValue);
+  return `<div class="scale-box"><label class="scale-label" for="scale-${id}-${esc(key)}"><span>${esc(label)}</span><output class="scale-value" for="scale-${id}-${esc(key)}">${rawValue===undefined?'—':value}</output></label><input id="scale-${id}-${esc(key)}" type="range" min="0" max="10" step="1" value="${value}" style="--amount:${value*10}%" data-scale-q="${id}" data-scale-key="${esc(key)}" aria-label="${esc(label)}: 0 to 10"><div class="scale-ends"><span>${esc(min)}</span><span>${esc(max)}</span></div></div>`;
+ }).join('');
+ return `<div class="instrument-inner"><div class="scale-boxes">${grid}</div><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:20px"><p class="control-hint" style="margin:0">MOVE A CONTROL TO RECORD YOUR POSITION. SCALE 0—10.</p><button class="inline-link" type="button" data-action="clear-control" data-q="${id}" ${exists?'':'disabled'}>CLEAR VALUES</button></div></div>`;
+}
+function classifiedCount(){return allLimits().filter(t=>getLimit(t.id).status!=='').length}
+function hardCount(){return allLimits().filter(t=>getLimit(t.id).status==='HARD LIMIT').length}
+function fantasyCount(){return allLimits().filter(t=>getLimit(t.id).status==='FANTASY ONLY').length}
+function limitStatsMarkup(){
+ return `<div class="limit-stat"><b>${classifiedCount()}</b><span>CLASSIFIED</span></div><div class="limit-stat"><b>${hardCount()}</b><span>HARD LIMITS</span></div><div class="limit-stat"><b>${fantasyCount()}</b><span>FANTASY ONLY</span></div><div class="limit-stat"><b>${state.custom.length}</b><span>YOUR ADDITIONS</span></div>`;
+}
+function renderLimits(){
+ return `<div class="limits-intro"><div><div class="overline" style="margin-bottom:12px">FINAL ROUND / CLASSIFY THE EDGE</div><h2 class="limits-title">LIMITS <em>INDEX.</em></h2></div><div class="limit-stats" id="limitStats">${limitStatsMarkup()}</div></div>
+ <div class="limit-toolbar">
+ <input class="field-input" type="search" id="limitSearch" value="${esc(state.filter.query)}" placeholder="SEARCH ALL 50 + YOUR ENTRIES" aria-label="Search limit topics" autocomplete="off">
+ <select id="limitCategory" class="field-select" aria-label="Filter limit topics by category"><option value="ALL">ALL CATEGORIES</option>${GROUPS.map(g=>`<option value="${esc(g.name)}" ${g.name===state.filter.category?'selected':''}>${esc(g.name)}</option>`).join('')}<option value="CUSTOM" ${state.filter.category==='CUSTOM'?'selected':''}>CUSTOM TOPICS</option></select>
+ <select id="limitFilter" class="field-select" aria-label="Filter limit topics by classification"><option value="ALL">EVERY STATUS</option><option value="UNCLASSIFIED" ${state.filter.status==='UNCLASSIFIED'?'selected':''}>UNCLASSIFIED</option>${STATUS.map(s=>`<option value="${esc(s)}" ${s===state.filter.status?'selected':''}>${esc(s)}</option>`).join('')}</select>
+ </div>
+ <div class="limit-info" id="limitInfo"><span>SHOWING <strong>${selectedTopics().length}</strong> / ${allLimits().length} TOPICS</span><span>SCROLL TO EXPLORE &#8595;</span></div>
+ <div class="limit-scroller" id="limitScroll" aria-label="Limit topic list"><div class="limit-grid" id="limitCards">${renderLimitCards()}</div></div>
+ <div class="custom-title">YOUR ADDITIONS / NO FIXED LIMIT</div>
+ <div class="custom-form"><input id="newLimit" class="field-input" type="text" maxlength="160" placeholder="ADD YOUR OWN TOPIC…" aria-label="Name of a new limit topic"><button type="button" class="btn btn-small btn-primary" data-action="add-custom">ADD TOPIC <span class="arrow">+</span></button></div>
+ `;
+}
+function selectedTopics(){
+ return allLimits().filter(t=>{
+  const l=getLimit(t.id),search=state.filter.query.trim().toLowerCase();
+  return (state.filter.category==='ALL'||state.filter.category===t.category)&&
+   (state.filter.status==='ALL'||(state.filter.status==='UNCLASSIFIED'&&!l.status)||state.filter.status===l.status)&&
+   (!search||t.name.toLowerCase().includes(search)||t.category.toLowerCase().includes(search)||(l.note||'').toLowerCase().includes(search));
+ });
+}
+function renderLimitCards(){
+ const visible=selectedTopics();
+ if(visible.length===0)return '<div class="limit-empty" style="grid-column:1/-1">NO MATCHES IN THIS VIEW.<br>CHANGE THE SEARCH OR FILTER TO SEE MORE.</div>';
+ return visible.map(t=>{
+  const l=getLimit(t.id),idx=t.custom?'CUSTOM':t.id.slice(1),editing=t.custom&&state.editCustom===t.id;
+  if(editing)return `<article class="limit-card"><div class="limit-index">EDIT CUSTOM TOPIC</div><input class="field-input" id="editName-${esc(t.id)}" type="text" maxlength="160" value="${esc(t.name)}" aria-label="Edit custom topic name" style="width:100%;margin-top:10px"><div class="custom-actions"><button type="button" class="btn btn-small btn-primary" data-action="save-custom" data-id="${esc(t.id)}">SAVE NAME</button><button type="button" class="btn btn-small btn-quiet" data-action="cancel-custom">CANCEL</button></div></article>`;
+  return `<article class="limit-card" data-status="${esc(l.status)}" data-limit-card="${esc(t.id)}">
+   <div class="limit-row"><div class="limit-name">${esc(t.name)}</div><span class="limit-index">${esc(idx)}</span></div>
+   <div class="limit-category">${esc(t.category)}</div>
+   <select class="topic-status" aria-label="Classification for ${esc(t.name)}" data-topic-status="${esc(t.id)}"><option value="" ${!l.status?'selected':''}>UNCLASSIFIED — SELECT</option>${STATUS.map(s=>`<option value="${esc(s)}" ${l.status===s?'selected':''}>${esc(s)}</option>`).join('')}</select>
+   <details class="note-details" ${l.note?'open':''}><summary>${l.note?'EDIT NOTE':'ADD NOTE'}</summary><textarea class="note-area" data-topic-note="${esc(t.id)}" rows="2" placeholder="Conditions, specifics, context…">${esc(l.note)}</textarea></details>
+   ${t.custom?`<div class="custom-actions"><button class="btn btn-small btn-quiet" type="button" data-action="edit-custom" data-id="${esc(t.id)}">EDIT TOPIC</button><button class="btn btn-small btn-quiet" type="button" data-action="remove-custom" data-id="${esc(t.id)}">REMOVE</button></div>`:''}
+  </article>`;
+ }).join('');
+}
+function updateLimitStats(){const e=$('#limitStats');if(e)e.innerHTML=limitStatsMarkup()}
+function updateLimitCards(){
+ const info=$('#limitInfo');if(info)info.innerHTML='<span>SHOWING <strong>'+selectedTopics().length+'</strong> / '+allLimits().length+' TOPICS</span><span>SCROLL TO EXPLORE &#8595;</span>';
+ const e=$('#limitCards');
+ if(!e)return;
+ const scroller=$('#limitScroll'),top=scroller?.scrollTop||0;
+ e.innerHTML=renderLimitCards();
+ if(scroller)scroller.scrollTop=top;
+ updateLimitStats();
+}
+
+function summarizeControl(id){
+ const a=answer(id),m=META[id];if(m.kind==='limits')return [];
+ const bits=[];
+ if(a.chosen.length)bits.push(...a.chosen);
+ if(m.scales)for(const [key,label] of m.scales){if(a.values[key]!==undefined)bits.push(label+': '+a.values[key]+'/10')}
+ return bits;
+}
+function renderReview(){
+ const count=answeredCount(),classified=classifiedCount();
+ return `<section class="review">
+ <div class="review-head"><div><div class="overline">THE COMPLETED SESSION / ${count} OF 25</div><h1 class="review-title">THE <span>RECORD.</span></h1></div><div class="review-sub">Four rounds. Twenty-five questions. Every answer, selection and classification, held together in one record.</div></div>
+ <div class="export-bar">
+ <button type="button" class="btn btn-primary" data-action="copy">COPY ALL ANSWERS <span class="arrow">↗</span></button>
+ <button type="button" class="btn btn-quiet" data-action="download-txt">DOWNLOAD .TXT ↓</button>
+ <button type="button" class="btn btn-quiet" data-action="download-json">DOWNLOAD .JSON ↓</button>
+ <button type="button" class="btn btn-quiet" data-action="back">← BACK TO 25</button>
+ </div>
+ <div class="review-statrow"><div class="review-stat"><b>${count}</b><span>QUESTIONS<br>ANSWERED</span></div><div class="review-stat"><b>${classified}</b><span>TOPICS<br>CLASSIFIED</span></div><div class="review-stat"><b>${hardCount()}</b><span>HARD<br>LIMITS</span></div><div class="review-stat"><b>${state.custom.length}</b><span>CUSTOM<br>TOPICS</span></div></div>
+ ${ROUNDS.map((r,i)=>`<div class="review-round"><span class="num">${r.n}</span><h2>${esc(r.name)}</h2></div><div class="review-list">${QUESTIONS.filter(q=>q.id>=r.start&&q.id<=r.end).map(q=>{const a=answer(q.id),control=summarizeControl(q.id);return `<article class="review-item"><header><span>${two(q.id)} / 25</span><button type="button" class="inline-link" data-action="jump" data-q="${q.id}">EDIT ↗</button></header><p class="review-q">${esc(q.text)}</p>${control.map(t=>`<span class="review-choice">${esc(t)}</span>`).join('')}<div class="review-answer ${a.text.trim()?'':'empty'}">${a.text.trim()?esc(a.text):'— NOT ANSWERED —'}</div></article>`}).join('')}</div>`).join('')}
+ <div class="review-round"><span class="num">∎</span><h2>LIMITS INDEX / ${TOPICS.length} PREDEFINED + ${state.custom.length} CUSTOM</h2></div>
+ <section class="review-limits"><h3>CLASSIFICATIONS.</h3><div style="margin-bottom:14px;color:#a38591;font:11px/1.6 var(--mono)">EVERY TOPIC IS INCLUDED, INCLUDING UNCLASSIFIED ENTRIES.</div>
+ ${allLimits().map(t=>{const l=getLimit(t.id);return `<div class="review-limit-row"><div><strong>${esc(t.name)}</strong><small>${esc(t.category)}${l.note?' — '+esc(l.note):''}</small></div><div class="right">${esc(l.status||'UNCLASSIFIED')}</div></div>`}).join('')}
+ </section>
+ <details class="review-preview"><summary>OPEN COMPLETE TEXT PREVIEW / SELECTABLE</summary><textarea id="exportPreview" readonly aria-label="Complete text export preview"></textarea></details>
+ <div class="review-foot"><div><small>ONE FILE. ONE FULL RECORD. NOTHING SENT.</small><br><button type="button" class="inline-link" data-action="reset-open">CLEAR ALL ANSWERS</button></div><button type="button" class="btn btn-primary" data-action="copy">COPY ALL ANSWERS <span class="arrow">↗</span></button></div>
+ </section>`;
+}
+function exportObject(){
+ return {document:'THRESHOLD',date:new Date().toISOString(),rounds:ROUNDS.map(r=>({name:r.name,questions:QUESTIONS.filter(q=>q.id>=r.start&&q.id<=r.end).map(q=>{
+ const a=answer(q.id);return {number:q.id,section:q.section,question:q.text,response:a.text,contextualSelections:summarizeControl(q.id),contextualRaw:{chosen:a.chosen.slice(),values:{...a.values}}}
+ })})),limits:{predefined:TOPICS.map(t=>({...t,classification:getLimit(t.id).status||'UNCLASSIFIED',note:getLimit(t.id).note})),custom:state.custom.map(t=>({...t,classification:getLimit(t.id).status||'UNCLASSIFIED',note:getLimit(t.id).note}))}};
+}
+function exportText(){
+ const lines=['THRESHOLD','FOUR ROUNDS / TWENTY-FIVE QUESTIONS','EXPORTED: '+new Date().toLocaleString(),'='.repeat(66),''];
+ for(const r of ROUNDS){
+  lines.push('ROUND '+r.n+' — '+r.name,'-'.repeat(66),'');
+  for(const q of QUESTIONS.filter(q=>q.id>=r.start&&q.id<=r.end)){
+   const a=answer(q.id),ctl=summarizeControl(q.id);
+   lines.push(String(q.id)+') '+q.text,'SECTION: '+q.section);
+   lines.push('CONTEXT: '+(ctl.length?ctl.join(' | '):'UNANSWERED'));
+   lines.push('RESPONSE: '+(a.text.trim()?a.text:'[UNANSWERED]'),'');
+  }
+ }
+ lines.push('='.repeat(66),'LIMITS INDEX — 50 PREDEFINED TOPICS','='.repeat(66),'');
+ for(const g of GROUPS){
+  lines.push('['+g.name+']');
+  for(const t of TOPICS.filter(t=>t.category===g.name)){
+   const l=getLimit(t.id);lines.push(t.id+' — '+t.name+' :: '+(l.status||'UNCLASSIFIED'));if(l.note)lines.push('  NOTE: '+l.note);
+  }
+  lines.push('');
+ }
+ lines.push('CUSTOM TOPICS');
+ if(!state.custom.length)lines.push('[NONE]');
+ for(const t of state.custom){
+  const l=getLimit(t.id);lines.push(t.name+' :: '+(l.status||'UNCLASSIFIED'));if(l.note)lines.push('  NOTE: '+l.note);
+ }
+ lines.push('','END OF RECORD');
+ return lines.join('\n');
+}
+function downloadFile(filename,content,type){
+ const blob=new Blob([content],{type:type+';charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),3500);toast(filename+' prepared.');
+}
+function showCopyFallback(value){
+ const dlg=$('#copyDialog'),ta=$('#manualCopy');ta.value=value;dlg.showModal();ta.focus();ta.select();
+}
+async function copyAll(){
+ const value=exportText();
+ if(navigator.clipboard&&typeof navigator.clipboard.writeText==='function'){
+  try{await navigator.clipboard.writeText(value);toast('ALL ANSWERS COPIED.');return}catch(e){}
+ }
+ try{
+  const ta=document.createElement('textarea');ta.value=value;ta.setAttribute('readonly','');ta.style.cssText='position:fixed;left:-9999px;top:0;opacity:0';
+  document.body.appendChild(ta);ta.focus();ta.select();const ok=document.execCommand('copy');ta.remove();
+  if(ok){toast('ALL ANSWERS COPIED.');return}
+ }catch(e){}
+ showCopyFallback(value);
+}
+function updateAnsweredMarker(id){
+ const q=QUESTIONS[id-1],dot=$('.qdot[data-q="'+id+'"]');
+ if(dot&&!dot.classList.contains('active'))dot.classList.toggle('done',isAnswered(q));
+ if(dot)dot.setAttribute('aria-label','Question '+id+', '+(isAnswered(q)?'answered':'unanswered'));
+ const rail=$('.rail-figures');if(rail)rail.innerHTML=`<span>${answeredCount()} ANSWERED</span><span>25 TOTAL</span>`;
+ const bar=$('.rail-progress span');if(bar)bar.style.width=answeredCount()/25*100+'%';
+}
+function updateWordCount(value){const e=$('#wordCount');if(e)e.textContent=(value.trim()?value.trim().split(/\s+/).length:0)+' WORDS'}
+function handleAction(button){
+ const name=button.dataset.action;
+ if(name==='home'){state.view='intro';render();return}
+ if(name==='start'){state.pendingRound=0;state.view='round';render();return}
+ if(name==='open-round'){state.pendingRound=Number(button.dataset.index);state.view='round';render();return}
+ if(name==='enter-round'){state.current=ROUNDS[state.pendingRound].start;state.view='question';render();return}
+ if(name==='jump'){navigate(Number(button.dataset.q));return}
+ if(name==='next'){next();return}
+ if(name==='back'){back();return}
+ if(name==='toggle-save'){enableSave();return}
+ if(name==='chip'){
+  const id=Number(button.dataset.q),a=answer(id),meta=META[id],value=button.dataset.value;
+  if(a.chosen.includes(value))a.chosen=a.chosen.filter(x=>x!==value);
+  else if(meta.mode==='single')a.chosen=[value];
+  else a.chosen.push(value);
+  for(const other of document.querySelectorAll('[data-action="chip"][data-q="'+id+'"]'))other.setAttribute('aria-pressed',a.chosen.includes(other.dataset.value)?'true':'false');
+  const clear=$('[data-action="clear-control"]');if(clear)clear.disabled=!(a.chosen.length||Object.keys(a.values).length);
+  persist();updateAnsweredMarker(id);return;
+ }
+ if(name==='clear-control'){
+  const id=Number(button.dataset.q),a=answer(id);a.chosen=[];a.values={};persist();
+  const instrument=$('.instrument');if(instrument)instrument.innerHTML=`<div class="instrument-top"><div class="instrument-label">${esc(META[id].title)}</div><span class="ticker">INTERACTIVE / OPTIONAL</span></div>${renderControl(id)}`;
+  updateAnsweredMarker(id);return;
+ }
+ if(name==='add-custom'){
+  const input=$('#newLimit');if(!input)return;const value=input.value.trim();
+  if(!value){input.focus();toast('NAME THE TOPIC FIRST.');return}
+  const id='C'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  state.custom.push({id,name:value});state.filter={query:'',category:'ALL',status:'ALL'};persist();
+  const typed=answer(25).text;render();
+  const scroller=$('#limitScroll');if(scroller)scroller.scrollTop=scroller.scrollHeight;
+  const select=$('[data-topic-status="'+id+'"]');select?.focus();
+  toast('CUSTOM TOPIC ADDED.');return;
+ }
+ if(name==='edit-custom'){state.editCustom=button.dataset.id;updateLimitCards();$('#editName-'+button.dataset.id)?.focus();return}
+ if(name==='cancel-custom'){state.editCustom=null;updateLimitCards();return}
+ if(name==='save-custom'){
+  const id=button.dataset.id,entry=state.custom.find(x=>x.id===id),input=$('#editName-'+id),value=input?.value.trim();
+  if(!entry||!value){toast('TOPIC NAME CANNOT BE EMPTY.');return}
+  entry.name=value;state.editCustom=null;persist();updateLimitCards();toast('CUSTOM TOPIC UPDATED.');return;
+ }
+ if(name==='remove-custom'){
+  const id=button.dataset.id;if(!window.confirm('Remove this custom topic and its notes?'))return;
+  state.custom=state.custom.filter(x=>x.id!==id);delete state.limits[id];state.editCustom=null;persist();updateLimitCards();toast('CUSTOM TOPIC REMOVED.');return;
+ }
+ if(name==='copy'){copyAll();return}
+ if(name==='download-txt'){downloadFile('THRESHOLD_responses.txt',exportText(),'text/plain');return}
+ if(name==='download-json'){downloadFile('THRESHOLD_responses.json',JSON.stringify(exportObject(),null,2),'application/json');return}
+ if(name==='reset-open'){$('#resetDialog').showModal();return}
+ if(name==='cancel-reset'){$('#resetDialog').close();return}
+ if(name==='confirm-reset'){
+  const saveWasOn=state.autosave;try{localStorage.removeItem(STORAGE_KEY)}catch(e){}
+  state=newState();state.autosave=saveWasOn;if(state.autosave)persist();
+  $('#resetDialog').close();render();toast('ALL ANSWERS CLEARED.');return;
+ }
+ if(name==='select-manual'){const ta=$('#manualCopy');ta.focus();ta.select();return}
+ if(name==='close-copy'){$('#copyDialog').close();return}
+}
+document.addEventListener('click',e=>{
+ const action=e.target.closest('[data-action]');if(action){e.preventDefault();handleAction(action)}
+});
+document.addEventListener('input',e=>{
+ const t=e.target;
+ if(t.matches('[data-answer]')){
+  const id=Number(t.dataset.answer);answer(id).text=t.value;
+  updateWordCount(t.value);persist();updateAnsweredMarker(id);
+  const max=Math.round(window.innerHeight*.6);t.style.height='auto';t.style.height=Math.max(142,Math.min(t.scrollHeight,max))+'px';return;
+ }
+ if(t.matches('[data-scale-q]')){
+  const id=Number(t.dataset.scaleQ),key=t.dataset.scaleKey,val=Number(t.value);
+  answer(id).values[key]=val;
+  t.style.setProperty('--amount',val*10+'%');const out=t.closest('.scale-box')?.querySelector('output');if(out)out.textContent=String(val);
+  const clear=$('[data-action="clear-control"]');if(clear)clear.disabled=false;
+  persist();updateAnsweredMarker(id);return;
+ }
+ if(t.matches('[data-topic-note]')){getLimit(t.dataset.topicNote).note=t.value;persist();return}
+ if(t.id==='limitSearch'){state.filter.query=t.value;updateLimitCards();return}
+});
+document.addEventListener('change',e=>{
+ const t=e.target;
+ if(t.matches('[data-topic-status]')){
+  const id=t.dataset.topicStatus;getLimit(id).status=t.value;
+  const card=t.closest('.limit-card');if(card)card.dataset.status=t.value;
+  persist();
+  if(state.filter.status!=='ALL')updateLimitCards();else updateLimitStats();
+  updateAnsweredMarker(25);return;
+ }
+ if(t.id==='limitCategory'){state.filter.category=t.value;updateLimitCards();return}
+ if(t.id==='limitFilter'){state.filter.status=t.value;updateLimitCards();return}
+});
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape')return;
+ if(e.target.id==='newLimit'&&e.key==='Enter'){e.preventDefault();handleAction($('[data-action="add-custom"]'));return}
+ const tag=e.target.tagName;
+ if(/^(INPUT|TEXTAREA|SELECT)$/.test(tag)||e.target.isContentEditable)return;
+ if(e.altKey&&e.key==='ArrowRight'&&state.view==='question'){e.preventDefault();next()}
+ if(e.altKey&&e.key==='ArrowLeft'&&state.view==='question'){e.preventDefault();back()}
+});
+render();
+</script>
+</body>
+</html>
