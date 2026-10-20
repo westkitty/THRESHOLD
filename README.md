@@ -55,3 +55,14 @@ Set `CHROME_BIN` to the browser executable path if necessary. Tests do not requi
 Real Android Brave and cross-browser password-backup testing remain manual checks; Chrome emulation does not establish actual device acceptance.
 
 The Git repository contains the **blank application and its governing prompt**, not any participant response data.
+
+## Completed single-file dossier
+
+The blank interactive questionnaire and a completed dossier are **two different shareable HTML files**.
+
+- **Blank questionnaire:** share `THRESHOLD.html` so someone can answer the 25 original questions and classify the 50 limits topics.
+- **Completed dossier:** from the final review, select **EXPORT THE DOSSIER .HTML** to create `THRESHOLD_dossier.html`. It is a standalone, read-only record containing all 25 questions, every response, the Signal Deck, every limits topic, and five working in-page navigation links. It can be opened offline and printed without running any JavaScript.
+- **Condensed message:** select **COPY CONDENSED BRIEF** for the answers and classified topics only, retaining exact question wording without inventing interpretations.
+- **Continue editing on another device:** use the blank questionnaire and a `.json` or password-protected `.thx` backup. The read-only dossier is **not** a resumable editable backup.
+
+**Privacy:** the completed HTML dossier contains the responses as readable, unencrypted text. It is generated locally only when requested, makes no network requests, and does not become part of the Git repository. The `.gitignore` protects the default dossier filename from accidental staging. The automated browser tests check its actual downloaded bytes, open the generated dossier through `file://`, verify the 25 questions and 50-topic limits index, and reject executable user-input markup.

@@ -35,6 +35,11 @@ assert.match(html, /<meta name="viewport"/);
 assert.match(html, /prefers-reduced-motion/);
 assert.match(html, /COPY ALL ANSWERS/);
 assert.match(html, /function renderSignalDeck/);
+assert.match(html, /function buildStandaloneDossier/);
+assert.match(html, /function exportBrief/);
+assert.match(html, /data-action="download-dossier"/);
+assert.match(html, /data-action="copy-brief"/);
+
 assert.match(html, /data-action="print-review"/);
 assert.match(html, /data-action="scale-step"/);
 assert.match(html, /function sealSession/);

@@ -1,5 +1,5 @@
 import {spawn} from 'node:child_process';
-import {readFileSync,writeFileSync,mkdtempSync,existsSync} from 'node:fs';
+import {readFileSync,writeFileSync,mkdtempSync,existsSync,unlinkSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {pathToFileURL,fileURLToPath} from 'node:url';
@@ -7,6 +7,7 @@ const root=fileURLToPath(new URL('../',import.meta.url)),port=Number(process.env
 const browser=process.env.CHROME_BIN||['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome','/usr/bin/chromium','/usr/bin/google-chrome'].find(existsSync);
 if(!browser){console.error('Chrome/Chromium not found. Set CHROME_BIN to a browser executable.');process.exit(2)}
 const tempProfile=mkdtempSync(join(tmpdir(),'threshold-cdp-'));
+const dossierPath=join(tmpdir(),'threshold-qa-export-'+process.pid+'.html');
 const chrome=spawn(browser,['--headless=new','--no-first-run','--disable-background-networking','--remote-allow-origins=*','--remote-debugging-port='+port,'--user-data-dir='+tempProfile,pathToFileURL(join(root,'THRESHOLD.html')).href],{stdio:'ignore'});
 let ws,seq=0;const pending=new Map(),errs=[],net=[];
 function check(name,good){if(!good)throw Error('FAIL: '+name);console.log('PASS '+name)}
@@ -68,19 +69,47 @@ async function main(){
  await send('Emulation.setEmulatedMedia',{media:'screen'});
  await js('updateReviewFilter("ALL")');
  check('export preview includes multiline text',await js('document.querySelector("#exportPreview").value.includes("First line\\nSecond & <line>")'));
+
+ check('dossier export button present',await js('!!document.querySelector("[data-action=download-dossier]")'));
+ check('condensed brief button present',await js('!!document.querySelector("[data-action=copy-brief]")'));
+ check('condensed brief includes only classified limits',await js('exportBrief().includes("HARD LIMIT")&&exportBrief().includes("My renamed addition")===false&&!exportBrief().includes(QUESTIONS[1].text)&&exportBrief().includes("First line\\nSecond & <line>")'));
+ await js('updateReviewFilter("OPEN")');
+ check('single-file dossier ignores review filters',await js('(()=>{const d=new DOMParser().parseFromString(buildStandaloneDossier(),"text/html");return d.querySelectorAll(".review-item").length===25&&d.querySelectorAll(".review-limit-row").length===51&&d.querySelectorAll(".signal-module").length===4})()'));
+ await js('updateReviewFilter("ALL")');
+ check('standalone dossier contains original answer and 50 predefined limits',await js('(()=>{const d=new DOMParser().parseFromString(buildStandaloneDossier(),"text/html");return d.querySelector(".review-answer").textContent.includes("First line\\nSecond & <line>")&&d.querySelectorAll(".review-limit-row").length===51&&d.body.textContent.includes(QUESTIONS[24].text)})()'));
+ check('dossier is inert and self-contained',await js('(()=>{const h=buildStandaloneDossier(),d=new DOMParser().parseFromString(h,"text/html");return !d.querySelector("script,link,img,button,[data-action]")&&d.querySelectorAll("style").length===1&&h.includes("Content-Security-Policy")&&!h.includes("https://")})()'));
+ check('dossier index links to all five sections',await js('(()=>{const d=new DOMParser().parseFromString(buildStandaloneDossier(),"text/html");const links=[...d.querySelectorAll(".dossier-nav a")];return links.length===5&&links.every(a=>d.getElementById(a.getAttribute("href").slice(1)))})()'));
+ await js('(()=>{answer(7).text="<img src=x onerror=window.__reportInjected=true> <script>alert(1)</script>";return true})()');
+ check('hostile answer remains inert inside exported dossier',await js('(()=>{const d=new DOMParser().parseFromString(buildStandaloneDossier(),"text/html");const a=d.querySelectorAll(".review-item")[6].querySelector(".review-answer");return !d.querySelector("img,script")&&a.textContent.includes("<script>alert(1)</script>")&&!window.__reportInjected})()'));
+ await js('(()=>{answer(7).text="";state.view="review";render();return true})()');
+ check('source questionnaire remains editable after report generation',await js('state.view==="review"&&document.querySelectorAll(".review-item").length===25&&document.querySelector("[data-action=jump]")!==null'));
  await js('(()=>{window.__downloads=[];HTMLAnchorElement.prototype.click=function(){window.__downloads.push(this.download)};return true})()');
  await click('[data-action=download-txt]');await click('[data-action=download-json]');
  check('TXT and JSON download controls work',await js('window.__downloads.includes("THRESHOLD_responses.txt")&&window.__downloads.includes("THRESHOLD_responses.json")'));
+ await js('(()=>{const previous=URL.createObjectURL.bind(URL);URL.createObjectURL=blob=>{window.__dossierBlob=blob;return previous(blob)};return true})()');
+ await click('[data-action=download-dossier]');
+ check('dossier download produces a named .html file',await js('window.__downloads.includes("THRESHOLD_dossier.html")&&window.__dossierBlob.type.startsWith("text/html")'));
+ check('actual downloaded HTML blob includes every record element',await js('(async()=>{const h=await window.__dossierBlob.text();const d=new DOMParser().parseFromString(h,"text/html");return d.querySelectorAll(".review-item").length===25&&d.querySelectorAll(".review-limit-row").length===51&&d.querySelectorAll("script,button,[data-action]").length===0&&d.body.textContent.includes("First line\\nSecond & <line>")})()'));
+ const dossierHtml=await js('window.__dossierBlob.text()');
+ writeFileSync(dossierPath,dossierHtml,'utf8');
+ check('downloaded bytes form a complete standalone file',dossierHtml.startsWith('<!doctype html>')&&dossierHtml.includes('THRESHOLD — Completed Dossier'));
+
+ check('condensed brief retains selection groups and response source',await js('exportBrief().includes("HARD LIMIT")&&exportBrief().includes(QUESTIONS[0].text)&&!exportBrief().includes(QUESTIONS[1].text)'));
+ await click('[data-action=copy-brief]');await delay(140);
+ check('condensed brief copy reports success or exposes manual fallback',await js('document.querySelector("#copyDialog").open||document.querySelector("#toast").textContent.includes("BRIEF COPIED")'));
+ if(await js('document.querySelector("#copyDialog").open'))await click('[data-action=close-copy]');
  await click('[data-action=copy]');await delay(250);
  check('copy action provides result or manual fallback',await js('document.querySelector("#copyDialog").open||document.querySelector("#toast").textContent.includes("COPIED")'));
  if(await js('document.querySelector("#copyDialog").open'))await click('[data-action=close-copy]');
  await send('Emulation.setDeviceMetricsOverride',{width:1280,height:800,deviceScaleFactor:1,mobile:false});
+ await js('state.view="review";render();document.querySelector(".delivery-band").scrollIntoView({block:"center",behavior:"instant"})');await delay(180);await screenshot('threshold-dossier-share');
  await js('state.view="intro";render()');await delay(180);await screenshot('threshold-desktop-cover');
  await js('state.view="question";state.current=9;render()');await delay(180);await screenshot('threshold-desktop-question');
  await js('state.view="review";render()');await delay(180);await screenshot('threshold-desktop');
  await send('Emulation.setDeviceMetricsOverride',{width:360,height:780,deviceScaleFactor:2,mobile:true});await delay(200);
  check('360px review without overflow',await js('document.documentElement.scrollWidth<=visualViewport.width+2'));
  await screenshot('threshold-mobile-review');
+ await js('document.querySelector(".delivery-band").scrollIntoView({block:"center",behavior:"instant"})');await delay(160);await screenshot('threshold-dossier-mobile');
  await click('[data-action=back]');
  check('360px limits without overflow',await js('state.current===25&&document.documentElement.scrollWidth<=visualViewport.width+2'));
  console.log('MOBILE-LAYOUT',JSON.stringify(await js('(()=>{const ss=[".question-body",".q-heading",".instrument",".workbench",".rail",".limit-toolbar",".limit-stats"].map(s=>{let e=document.querySelector(s),b=e?.getBoundingClientRect();return {selector:s,x:b?.x,right:b?.right,width:b?.width,scroll:e?.scrollWidth,client:e?.clientWidth,font:e?getComputedStyle(e).fontSize:null}});return {inner:innerWidth,visual:visualViewport.width,screen:document.documentElement.scrollWidth,rects:ss}})()')));
@@ -196,7 +225,16 @@ async function main(){
  check('clear all removes answers and limits',await js('state.view==="intro"&&Object.keys(state.answers).length===0&&Object.keys(state.limits).length===0&&state.custom.length===0'));
  check('zero unhandled browser errors',errs.length===0);
  check('no external requests',net.every(x=>x.startsWith('file:')||x.startsWith('data:')));
+ const nav=await send('Page.navigate',{url:pathToFileURL(dossierPath).href});
+ if(nav.errorText)throw Error('Dossier file navigation: '+nav.errorText);
+ await delay(550);
+ check('downloaded dossier opens directly as a local file',await js('location.protocol==="file:"&&document.querySelectorAll(".review-item").length===25&&document.querySelectorAll(".review-limit-row").length===51'));
+ check('read-only file has five working section anchors',await js('(()=>{const a=[...document.querySelectorAll(".dossier-nav a")];return a.length===5&&a.every(x=>document.getElementById(x.getAttribute("href").slice(1)))})()'));
+ check('standalone file contains no executable scripts or dead actions',await js('document.querySelectorAll("script,button,[data-action]").length===0&&document.querySelectorAll("style").length===1'));
+ check('dossier opens with no network requests',net.every(x=>x.startsWith('file:')||x.startsWith('data:')));
+ await screenshot('threshold-standalone-dossier');
+
  console.log('ALL CHECKS PASSED / screens: /tmp/threshold-{desktop,mobile-review,mobile-limits,mobile-cover}.jpg');
 }
 try{await main()}catch(e){console.error(e.stack||String(e));process.exitCode=1}
-finally{if(ws)ws.close();chrome.kill('SIGTERM')}
+finally{if(ws)ws.close();chrome.kill('SIGTERM');try{unlinkSync(dossierPath)}catch{}}

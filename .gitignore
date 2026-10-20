@@ -14,3 +14,6 @@ answers/
 
 # Personal encrypted response backups
 *.thx
+
+# A completed HTML dossier contains participant answers
+THRESHOLD_dossier.html

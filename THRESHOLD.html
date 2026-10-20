@@ -326,6 +326,23 @@ input,textarea,select,button,summary{scroll-margin-bottom:115px}
 .scale-nudge{width:42px;min-height:34px;background:#2c0b17;border:1px solid #743147;color:#f4cad7;font:700 22px/1 var(--mono);transition:background .15s,transform .15s}
 .scale-nudge:hover{background:#8e153b;color:#fff}.scale-nudge:active{transform:translateY(2px);background:#eb1247}
 .scale-nudge-label{font:9px/1.2 var(--mono);letter-spacing:.08em;color:#90717d;text-align:center}
+
+/* Complete-file delivery: the finished interview becomes its own offline artifact */
+.delivery-band{position:relative;overflow:hidden;margin:35px 0 39px;padding:clamp(22px,3.1vw,43px);display:grid;grid-template-columns:minmax(0,1.15fr) minmax(240px,.85fr);gap:30px;align-items:end;border:1px solid #ad204b;background:radial-gradient(ellipse at 94% 12%,rgba(190,6,59,.23),transparent 53%),linear-gradient(120deg,#270713 0%,#10090e 64%,#200911 100%);box-shadow:9px 9px 0 rgba(87,2,27,.23)}
+.delivery-band:before{content:"";position:absolute;top:0;left:0;width:30%;height:4px;background:#ff214f;box-shadow:13vw 0 0 #5d122a}
+.delivery-band:after{content:"//";position:absolute;right:14px;top:-31px;font:900 clamp(120px,17vw,190px) var(--display);letter-spacing:-.07em;color:rgba(255,35,81,.075);pointer-events:none}
+.delivery-band-label{color:#ff6d92;font:700 10px var(--mono);letter-spacing:.17em}
+.delivery-band h2{font:900 clamp(55px,6.4vw,93px)/.83 var(--display);letter-spacing:-.047em;margin:22px 0;position:relative;z-index:1}
+.delivery-band h2 em{font-style:normal;color:#ff1744}
+.delivery-band p{max-width:480px;margin:0;font:12px/1.75 var(--mono);color:#d7aebb}
+.delivery-buttons{display:flex;flex-direction:column;gap:12px;position:relative;z-index:1}
+.delivery-buttons .btn{width:100%;min-height:64px}
+.delivery-buttons .btn-primary{box-shadow:5px 5px 0 rgba(90,2,27,.62)}
+.delivery-buttons .delivery-caption{font:10px/1.6 var(--mono);letter-spacing:.015em;color:#ad8392}
+@media(max-width:820px){.delivery-band{grid-template-columns:1fr;gap:24px}.delivery-band h2{font-size:clamp(70px,12vw,95px)}}
+@media(max-width:400px){.delivery-band{padding:20px 17px}.delivery-band h2{font-size:61px}.delivery-buttons .btn{font-size:10px;padding:14px 13px}}
+@media print{.delivery-band{display:none!important}}
+
 </style>
 </head>
 <body>
@@ -835,6 +852,119 @@ function renderSignalDeck(){
  </section>`;
 }
 
+
+/* The dossier is intentionally static: participant responses remain data, never script. */
+const DOSSIER_STYLE=String.raw`
+.dossier-banner{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:23px clamp(18px,5vw,74px);max-width:1320px;margin:auto;border-bottom:1px solid #a12044}
+.dossier-banner strong{font:900 24px var(--display);letter-spacing:.12em}
+.dossier-banner strong span{color:var(--hot)}
+.dossier-banner .dossier-stamp{font:10px/1.8 var(--mono);color:#c99cae;text-align:right;letter-spacing:.09em}
+.dossier-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap;max-width:1320px;margin:0 auto;padding:20px clamp(18px,5vw,74px) 5px}
+.dossier-nav a{display:inline-flex;align-items:center;gap:6px;padding:12px 13px;border:1px solid #5b293a;background:#210e17;color:#e9b1c1;font:10px/1.2 var(--mono);letter-spacing:.07em;text-decoration:none}
+.dossier-nav a:hover,.dossier-nav a:focus-visible{background:#66132f;border-color:#ff2556;color:#fff}
+@media print{.dossier-nav{display:none!important}}
+.dossier-read-only{font:11px/1.65 var(--mono);color:#a38a94;margin:24px auto 0;max-width:1170px;padding:0 clamp(18px,5vw,74px)}
+.dossier-read-only b{color:#ff819d}
+.dossier-footer{max-width:1320px;margin:0 auto;padding:23px clamp(18px,5vw,74px) 38px;border-top:1px solid var(--rim);font:10px/1.7 var(--mono);color:#b893a0;letter-spacing:.08em}
+.dossier-static .signal-category{cursor:default}
+.dossier-static .signal-category:hover .signal-category-name{color:#e8cad4}
+.dossier-static .review-round{break-after:avoid}
+.dossier-static .review-item{break-inside:avoid}
+@media(max-width:580px){.dossier-banner{align-items:flex-start;flex-direction:column}.dossier-banner .dossier-stamp{text-align:left}}
+@media print{.dossier-banner{padding:0 0 12px;margin-bottom:10px;color:#111;border-bottom:2px solid #111}.dossier-banner strong,.dossier-banner strong span{color:#111!important}.dossier-banner .dossier-stamp,.dossier-read-only{color:#333!important}.dossier-footer{color:#444!important}}
+`;
+function buildStandaloneDossier(){
+ const holder=document.createElement('div');
+ holder.innerHTML=renderReview();
+ const content=holder.querySelector('.review');
+ if(!content)throw Error('Unable to render dossier.');
+ // Export always contains every question, independent of the current review filter.
+ content.querySelectorAll('[hidden]').forEach(element=>element.removeAttribute('hidden'));
+ content.querySelectorAll('.export-bar,.review-signal,.review-preview,.review-foot,.delivery-band').forEach(element=>element.remove());
+ content.querySelectorAll('button').forEach(button=>{
+   if(button.classList.contains('signal-category')){
+     const display=document.createElement('div');
+     display.className=button.className;
+     display.innerHTML=button.innerHTML;
+     button.replaceWith(display);
+   }else button.remove();
+ });
+ content.querySelectorAll('[data-action]').forEach(element=>element.removeAttribute('data-action'));
+ const sections=[...content.querySelectorAll('.review-round')];
+ if(sections.length!==5)throw Error('Dossier section count mismatch.');
+ sections.forEach((section,i)=>section.id=i<4?'dossier-round-'+(i+1):'dossier-limits');
+ const nav=`<nav class="dossier-nav" aria-label="Dossier sections">${ROUNDS.map((round,i)=>`<a href="#dossier-round-${i+1}">ROUND ${round.n} / ${esc(round.short)}</a>`).join('')}<a href="#dossier-limits">LIMITS INDEX</a></nav>`;
+ const css=document.querySelector('style')?.textContent||'';
+ const count=answeredCount(),date=new Date().toLocaleString();
+ const escapedDate=esc(date);
+ return `<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark"><meta name="theme-color" content="#080608">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; font-src data:">
+<title>THRESHOLD — Completed Dossier</title>
+<style>${css}\n${DOSSIER_STYLE}</style></head>
+<body class="dossier-static"><div class="top-rule" aria-hidden="true"></div>
+<header class="dossier-banner"><strong>THRESH<span>OLD.</span></strong>
+<div class="dossier-stamp">COMPLETED DOSSIER / READ ONLY<br>${escapedDate}<br>${count} OF 25 QUESTIONS ENGAGED</div></header>
+${nav}
+<div class="dossier-read-only"><b>ONE FILE. ONE COMPLETE RECORD.</b> This read-only copy contains all questions, responses, selections, and classifications, including unanswered entries. It does not synchronize with the original questionnaire.</div>
+<main id="record" aria-label="Completed THRESHOLD questionnaire">${content.outerHTML}</main>
+<footer class="dossier-footer">THRESHOLD / COMPLETE OFFLINE RECORD&nbsp; · &nbsp;READ ONLY&nbsp; · &nbsp;${escapedDate}</footer>
+</body></html>`;
+}
+function exportBrief(){
+ const lines=['THRESHOLD / CONDENSED BRIEF','EXPORTED: '+new Date().toLocaleString(),
+   'Only answered questions and classified limits are included. This is not the full archive.','='.repeat(58),''];
+ const categorized=allLimits();
+ let anyStatus=false;
+ for(const status of STATUS){
+   const matches=categorized.filter(topic=>getLimit(topic.id).status===status);
+   if(!matches.length)continue;
+   anyStatus=true;
+   lines.push('['+status+']');
+   for(const topic of matches){
+     const note=getLimit(topic.id).note;
+     lines.push('• '+topic.name+(topic.category==='CUSTOM'?' [CUSTOM]':''));
+     if(note)lines.push('  NOTE: '+note);
+   }
+   lines.push('');
+ }
+ if(!anyStatus)lines.push('NO LIMIT TOPICS CLASSIFIED.','');
+ lines.push('ENGAGED QUESTIONS','-'.repeat(58),'');
+ let anyQuestion=false;
+ for(const r of ROUNDS){
+   const selected=QUESTIONS.filter(q=>q.id>=r.start&&q.id<=r.end&&isAnswered(q));
+   if(!selected.length)continue;
+   anyQuestion=true;
+   lines.push('ROUND '+r.n+' / '+r.name);
+   for(const question of selected){
+     const a=answer(question.id),controls=summarizeControl(question.id);
+     lines.push(question.id+') '+question.text);
+     if(controls.length)lines.push('CONTEXT: '+controls.join(' | '));
+     lines.push('RESPONSE: '+(a.text.trim()?a.text:'[NO WRITTEN RESPONSE]'),'');
+   }
+ }
+ if(!anyQuestion)lines.push('NO QUESTIONS ENGAGED.','');
+ lines.push('END OF CONDENSED BRIEF');
+ return lines.join('\n');
+}
+async function copyTextValue(value,message){
+ if(navigator.clipboard&&typeof navigator.clipboard.writeText==='function'){
+  try{await navigator.clipboard.writeText(value);toast(message);return}catch(e){}
+ }
+ try{
+  const textarea=document.createElement('textarea');
+  textarea.value=value;
+  textarea.setAttribute('readonly','');
+  textarea.style.cssText='position:fixed;left:-9999px;top:0;opacity:0';
+  document.body.appendChild(textarea);textarea.focus();textarea.select();
+  const copied=document.execCommand('copy');textarea.remove();
+  if(copied){toast(message);return}
+ }catch(e){}
+ showCopyFallback(value);
+}
+
 function renderReview(){
  const count=answeredCount(),classified=classifiedCount();
  return `<section class="review">
@@ -846,6 +976,13 @@ function renderReview(){
  <button type="button" class="btn btn-quiet" data-action="back">← BACK TO 25</button>
  </div>
  <div class="review-statrow"><div class="review-stat"><b>${count}</b><span>QUESTIONS<br>ANSWERED</span></div><div class="review-stat"><b>${classified}</b><span>TOPICS<br>CLASSIFIED</span></div><div class="review-stat"><b>${hardCount()}</b><span>HARD<br>LIMITS</span></div><div class="review-stat"><b>${state.custom.length}</b><span>CUSTOM<br>TOPICS</span></div></div>
+ <section class="delivery-band" aria-label="Share your completed record">
+<div class="delivery-identity"><div class="delivery-band-label">OFFLINE / COMPLETE / ONE FILE</div><h2>THE WHOLE<br><em>RECORD.</em></h2>
+<p>Make this completed questionnaire a standalone, read-only HTML dossier. Every original question, written response and limits classification travels inside the one file.</p></div>
+<div class="delivery-buttons"><button type="button" class="btn btn-primary" data-action="download-dossier">EXPORT THE DOSSIER .HTML <span class="arrow">↗</span></button>
+<button type="button" class="btn btn-quiet" data-action="copy-brief">COPY CONDENSED BRIEF <span class="arrow">↗</span></button>
+<p class="delivery-caption">The exported dossier includes readable personal answers. It is not encrypted. The original questionnaire remains editable and unchanged.</p></div>
+</section>
  ${renderSignalDeck()}
  <div class="review-signal"><div><h2>THE GAPS.</h2><p id="reviewFilterCount">25 QUESTIONS IN THE RECORD</p></div><div class="review-filter" role="group" aria-label="Filter reviewed questions"><button type="button" data-action="review-filter" data-filter="ALL" aria-pressed="true">ALL 25</button><button type="button" data-action="review-filter" data-filter="ANSWERED" aria-pressed="false">ENGAGED / ${count}</button><button type="button" data-action="review-filter" data-filter="OPEN" aria-pressed="false">OPEN / ${25-count}</button>${count<25?`<button type="button" data-action="review-first-open">GO TO FIRST OPEN ↗</button>`:''}</div></div>
  ${ROUNDS.map((r,i)=>`<div class="review-round"><span class="num">${r.n}</span><h2>${esc(r.name)}</h2></div><div class="review-list">${QUESTIONS.filter(q=>q.id>=r.start&&q.id<=r.end).map(q=>{const a=answer(q.id),control=summarizeControl(q.id);return `<article class="review-item" data-review-item data-engaged="${isAnswered(q)}"><header><span>${two(q.id)} / 25</span><button type="button" class="inline-link" data-action="jump" data-q="${q.id}">EDIT ↗</button></header><p class="review-q">${esc(q.text)}</p>${control.map(t=>`<span class="review-choice">${esc(t)}</span>`).join('')}<div class="review-answer ${a.text.trim()?'':'empty'}">${a.text.trim()?esc(a.text):'— NO WRITTEN RESPONSE —'}</div></article>`}).join('')}</div>`).join('')}
@@ -909,20 +1046,9 @@ function downloadFile(filename,content,type){
  setTimeout(()=>URL.revokeObjectURL(url),3500);toast(filename+' prepared.');
 }
 function showCopyFallback(value){
- const dlg=$('#copyDialog'),ta=$('#manualCopy');ta.value=value;dlg.showModal();ta.focus();ta.select();
+ const dlg=$('#copyDialog'),ta=$('#manualCopy');$('#copyTitle').textContent=value.startsWith('THRESHOLD / CONDENSED BRIEF')?'CONDENSED BRIEF.':'YOUR COMPLETE RECORD.';ta.value=value;dlg.showModal();ta.focus();ta.select();
 }
-async function copyAll(){
- const value=exportText();
- if(navigator.clipboard&&typeof navigator.clipboard.writeText==='function'){
-  try{await navigator.clipboard.writeText(value);toast('ALL ANSWERS COPIED.');return}catch(e){}
- }
- try{
-  const ta=document.createElement('textarea');ta.value=value;ta.setAttribute('readonly','');ta.style.cssText='position:fixed;left:-9999px;top:0;opacity:0';
-  document.body.appendChild(ta);ta.focus();ta.select();const ok=document.execCommand('copy');ta.remove();
-  if(ok){toast('ALL ANSWERS COPIED.');return}
- }catch(e){}
- showCopyFallback(value);
-}
+async function copyAll(){return copyTextValue(exportText(),'ALL ANSWERS COPIED.')}
 function updateAnsweredMarker(id){
  const q=QUESTIONS[id-1],dot=$('.qdot[data-q="'+id+'"]');
  if(dot&&!dot.classList.contains('active'))dot.classList.toggle('done',isAnswered(q));
@@ -1016,6 +1142,8 @@ function handleAction(button){
  if(name==='copy'){copyAll();return}
  if(name==='download-txt'){downloadFile('THRESHOLD_responses.txt',exportText(),'text/plain');return}
  if(name==='download-json'){downloadFile('THRESHOLD_responses.json',JSON.stringify(exportObject(),null,2),'application/json');return}
+ if(name==='download-dossier'){downloadFile('THRESHOLD_dossier.html',buildStandaloneDossier(),'text/html');return}
+ if(name==='copy-brief'){copyTextValue(exportBrief(),'CONDENSED BRIEF COPIED.');return}
  if(name==='print-review'){window.print();return}
  if(name==='reset-open'){$('#resetDialog').showModal();return}
  if(name==='cancel-reset'){$('#resetDialog').close();return}
