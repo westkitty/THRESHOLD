@@ -343,6 +343,22 @@ input,textarea,select,button,summary{scroll-margin-bottom:115px}
 @media(max-width:400px){.delivery-band{padding:20px 17px}.delivery-band h2{font-size:61px}.delivery-buttons .btn{font-size:10px;padding:14px 13px}}
 @media print{.delivery-band{display:none!important}}
 
+
+/* Resume dock / reversible navigation without storing private answers implicitly */
+.resume-dock{margin:19px 0 28px;padding:clamp(22px,3vw,35px);display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,.8fr);gap:28px;align-items:center;border:1px solid #96304c;background:linear-gradient(115deg,#270b17 0%,#170b11 56%,#2a0614 100%);position:relative;overflow:hidden}
+.resume-dock:before{content:"";position:absolute;height:3px;top:0;left:0;width:30%;background:var(--hot)}
+.resume-big{display:flex;align-items:baseline;gap:12px;margin:12px 0 8px}
+.resume-big strong{font:900 clamp(75px,9vw,116px)/.8 var(--display);color:var(--ink)}
+.resume-big span{font:800 28px var(--display);color:var(--hot)}
+.resume-dock p{display:flex;justify-content:space-between;max-width:420px;gap:10px;margin:18px 0 10px;font:10px var(--mono);letter-spacing:.1em;color:#d7b8c2}
+.resume-pct{color:#ff658c}
+.resume-track{height:7px;max-width:420px;background:#3d1a29;overflow:hidden}
+.resume-track span{display:block;height:100%;background:linear-gradient(90deg,#9e1039,#ff1744)}
+.resume-dock small{display:block;margin-top:13px;max-width:440px;font:10px/1.7 var(--mono);color:#9d8390;letter-spacing:.03em}
+.resume-dock-actions{display:flex;flex-direction:column;gap:12px}
+.resume-dock-actions .btn{width:100%;min-height:58px}
+@media(max-width:760px){.resume-dock{grid-template-columns:1fr;gap:19px;margin-bottom:24px}.resume-big strong{font-size:82px}.resume-dock-actions .btn{font-size:10px;letter-spacing:.04em;gap:9px;padding:14px 12px}}
+@media print{.resume-dock{display:none!important}}
 </style>
 </head>
 <body>
@@ -365,7 +381,7 @@ input,textarea,select,button,summary{scroll-margin-bottom:115px}
 <p class="lock-status" id="lockMessage" role="status"></p>
 <div class="dialog-actions"><button type="button" class="btn btn-quiet" data-action="lock-close">CANCEL</button><button type="button" class="btn btn-primary" data-action="lock-write" id="lockSave">ENCRYPT + SAVE ↓</button></div>
 </div></dialog>
-<dialog id="resetDialog" aria-labelledby="resetTitle"><div class="dialog-body"><div class="overline">CLEAR SESSION</div><h2 id="resetTitle">ERASE RESPONSES?</h2><p>This clears every answer, selection, and custom limit in this browser session, including locally saved answers.</p><div class="dialog-actions"><button class="btn btn-quiet" type="button" data-action="cancel-reset">KEEP RESPONSES</button><button class="btn btn-primary" type="button" data-action="confirm-reset">CLEAR EVERYTHING <span class="arrow">→</span></button></div></div></dialog>
+<dialog id="resetDialog" aria-labelledby="resetTitle"><div class="dialog-body"><div class="overline">CLEAR SESSION</div><h2 id="resetTitle">ERASE RESPONSES?</h2><p>This clears every answer, selection, and custom limit in this browser session, including locally saved answers.</p><div class="dialog-actions"><button class="btn btn-quiet" type="button" data-action="cancel-reset">KEEP RESPONSES</button><button class="btn btn-quiet" type="button" data-action="reset-backup">DOWNLOAD BACKUP ↓</button><button class="btn btn-primary" type="button" data-action="confirm-reset">CLEAR EVERYTHING <span class="arrow">→</span></button></div></div></dialog>
 <dialog id="copyDialog" aria-labelledby="copyTitle"><div class="dialog-body"><div class="overline">MANUAL COPY</div><h2 id="copyTitle">YOUR COMPLETE RECORD.</h2><p>Your browser didn't allow automatic copying. Select the text below and copy it manually.</p><textarea id="manualCopy" class="dialog-text" readonly aria-label="Complete response text for manual copying"></textarea><div class="dialog-actions"><button class="btn btn-primary" type="button" data-action="select-manual">SELECT ALL TEXT <span class="arrow">↗</span></button><button class="btn btn-quiet" type="button" data-action="close-copy">CLOSE</button></div></div></dialog>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 <script>
@@ -424,7 +440,9 @@ function retrieveState(){
   const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return null;
   const data=JSON.parse(raw);
   if(!data||data.autosave!==true||!data.answers||!data.limits)return null;
-  return {...newState(),...data,view:'intro',pendingRound:0,filter:{query:'',category:'ALL',status:'ALL'},editCustom:null,custom:Array.isArray(data.custom)?data.custom:[]};
+  const savedPosition=Number.isInteger(data.current)&&data.current>=1&&data.current<=25?data.current:null;
+  const firstOpen=QUESTIONS.find(q=>{const a=data.answers[q.id];return !a||!(typeof a.text==='string'&&a.text.trim()||(Array.isArray(a.chosen)&&a.chosen.length)||(a.values&&typeof a.values==='object'&&Object.keys(a.values).length));});
+  return {...newState(),...data,current:savedPosition||(firstOpen?.id||25),view:'intro',pendingRound:0,filter:{query:'',category:'ALL',status:'ALL'},editCustom:null,custom:Array.isArray(data.custom)?data.custom:[]};
  }catch(e){return null}
 }
 let state=retrieveState()||newState(),toastTimer=null;
@@ -438,17 +456,27 @@ function getLimit(id){if(!state.limits[id])state.limits[id]={status:'',note:''};
 function allLimits(){return TOPICS.concat(state.custom.map(c=>({id:c.id,name:c.name,category:'CUSTOM',custom:true})))}
 function isAnswered(q){const a=state.answers[q.id];if(q.id===25&&(state.custom.length>0||Object.values(state.limits).some(l=>l&&(l.status||(l.note||'').trim()))))return true;return !!a&&(a.text.trim()!==''||a.chosen.length>0||Object.keys(a.values).length>0)}
 function answeredCount(){return QUESTIONS.filter(isAnswered).length}
+let exitGuardActive=false;
+function warnBeforeLeaving(event){event.preventDefault();event.returnValue=''}
+function syncExitGuard(){
+ const unprotected=!state.autosave&&answeredCount()>0;
+ if(unprotected===exitGuardActive)return;
+ if(unprotected)window.addEventListener('beforeunload',warnBeforeLeaving);
+ else window.removeEventListener('beforeunload',warnBeforeLeaving);
+ exitGuardActive=unprotected;
+}
 function persist(){
+ syncExitGuard();
  if(!state.autosave)return;
- try{localStorage.setItem(STORAGE_KEY,JSON.stringify({autosave:true,answers:state.answers,limits:state.limits,custom:state.custom,view:'intro'}))}
- catch(e){state.autosave=false;refreshHeader();toast('Device saving is unavailable in this browser. Answers remain in this session.')}
+ try{localStorage.setItem(STORAGE_KEY,JSON.stringify({autosave:true,answers:state.answers,limits:state.limits,custom:state.custom,current:state.current,view:'intro'}))}
+ catch(e){state.autosave=false;syncExitGuard();refreshHeader();toast('Device saving is unavailable in this browser. Answers remain in this session.')}
 }
 function enableSave(){
- if(state.autosave){state.autosave=false;try{localStorage.removeItem(STORAGE_KEY)}catch(e){};refreshHeader();toast('Device saving switched off.');return}
- state.autosave=true;
- try{localStorage.setItem(STORAGE_KEY,JSON.stringify({autosave:true,answers:state.answers,limits:state.limits,custom:state.custom}))}
- catch(e){state.autosave=false;toast('This browser does not permit storage for local files.');}
- refreshHeader();
+ if(state.autosave){
+  state.autosave=false;try{localStorage.removeItem(STORAGE_KEY)}catch(e){}
+  syncExitGuard();refreshHeader();toast('Device saving switched off.');return
+ }
+ state.autosave=true;persist();refreshHeader();
  if(state.autosave)toast('Responses will be saved in this browser.');
 }
 function refreshHeader(){
@@ -464,20 +492,21 @@ function navigate(q,{gate=false}={}){
  const id=Math.max(1,Math.min(25,Number(q)||1));const newRound=roundIndex(id);
  if(gate&&ROUNDS[newRound].start===id){state.pendingRound=newRound;state.view='round'}
  else {state.current=id;state.view='question'}
- render();
+ if(gate)state.current=id;
+ persist();render();
 }
 function next(){
  if(state.view==='question'){
-  if(state.current===25){state.view='review';render();return}
+  if(state.current===25){state.view='review';persist();render();return}
   navigate(state.current+1,{gate:true});
  }
 }
 function back(){
  if(state.view==='question'){
-  if(state.current===1){state.view='intro';render();return}
+  if(state.current===1){state.view='intro';persist();render();return}
   navigate(state.current-1);
  }else if(state.view==='review'){navigate(25)}
- else if(state.view==='round'){state.view='intro';render()}
+ else if(state.view==='round'){state.view='intro';persist();render()}
 }
 function render(){
  refreshHeader();
@@ -661,13 +690,32 @@ function applyImport(){
  if(!pendingImport)return;
  const record=pendingImport;
  state.answers=record.answers;state.limits=record.limits;state.custom=record.custom;
- state.filter={query:'',category:'ALL',status:'ALL'};state.current=1;state.pendingRound=0;state.view='intro';state.reviewFilter='ALL';
+ state.filter={query:'',category:'ALL',status:'ALL'};state.current=QUESTIONS.find(q=>!isAnswered(q))?.id||25;state.pendingRound=0;state.view='intro';state.reviewFilter='ALL';
  pendingImport=null;pendingLocked=null;
- if(state.autosave)persist();
+ persist();
  $('#importDialog').close();render();toast('COMPLETE SESSION RESTORED.');
 }
 
+function nextOpenQuestion(){return QUESTIONS.find(q=>!isAnswered(q))?.id||null}
+function renderResumeDock(){
+ const touched=answeredCount(),resume=state.current;
+ if(!touched&&resume===1)return '';
+ const nextOpen=nextOpenQuestion(),ratio=Math.round(touched/25*100);
+ return `<section class="resume-dock" aria-label="Continue existing session">
+  <div class="resume-dock-copy"><div class="overline">SESSION STILL IN PROGRESS</div>
+  <div class="resume-big"><strong>${two(resume)}</strong><span>/25</span></div>
+  <p>${touched} ${touched===1?'QUESTION':'QUESTIONS'} ENGAGED <span class="resume-pct">${ratio}%</span></p>
+  <div class="resume-track" aria-label="${touched} of 25 questions engaged"><span style="width:${ratio}%"></span></div>
+  <small>${state.autosave?'PROGRESS SAVED ON THIS DEVICE':'ONLY HELD IN THIS OPEN TAB — SAVE OR EXPORT TO KEEP IT'}</small>
+  </div>
+  <div class="resume-dock-actions">
+   <button type="button" class="btn btn-primary" data-action="resume-last">RESUME / QUESTION ${two(resume)} <span class="arrow">↗</span></button>
+   <button type="button" class="btn btn-quiet" data-action="resume-next">${nextOpen?'NEXT OPEN / QUESTION '+two(nextOpen):'REVIEW COMPLETE RECORD'} <span class="arrow">↗</span></button>
+  </div>
+ </section>`;
+}
 function renderIntro(){
+ const inProgress=answeredCount()>0||state.current>1;
  return `<section class="landing">
   <div class="cover-grid">
    <div class="cover-copy">
@@ -675,11 +723,12 @@ function renderIntro(){
     <h1 class="cover-title">THRESH<em>O</em>LD</h1>
     <p class="cover-explainer">You are going to give me an understanding of where your experience threshold is.</p>
     <p class="cover-instruction">This will occur across four rounds.<br>Don't think too hard about it - respond reflexively.</p>
-    <div class="cover-actions"><button class="btn btn-primary" type="button" data-action="start">BEGIN / FIRST ROUND <span class="arrow">↗</span></button><button type="button" class="btn btn-quiet" data-action="import-open">RESTORE RECORD ↑</button><span class="micro-label">25 QUESTIONS<br>FOUR ROUNDS<br>ONE COMPLETE RECORD</span></div>
+    <div class="cover-actions">${inProgress?`<button class="btn btn-primary" type="button" data-action="resume-last">RESUME / QUESTION ${two(state.current)} <span class="arrow">↗</span></button><button type="button" class="btn btn-quiet" data-action="start">REVISIT ROUND I ↗</button>`:`<button class="btn btn-primary" type="button" data-action="start">BEGIN / FIRST ROUND <span class="arrow">↗</span></button>`}<button type="button" class="btn btn-quiet" data-action="import-open">RESTORE RECORD ↑</button><span class="micro-label">25 QUESTIONS<br>FOUR ROUNDS<br>ONE COMPLETE RECORD</span></div>
    </div>
    <div class="cover-graphic" aria-hidden="true"><div class="halo"></div><div class="orbit-cross"></div><div class="halo-center"><span class="num">25</span><span class="num-label">INTERROGATIONS</span></div><div class="halo-small a">POSITION / UNKNOWN</div><div class="halo-small b">BOUNDARY / IN FLUX</div><div class="halo-small c">YOU ARE HERE — 00/25</div></div>
   </div>
   <div class="cover-divider">FOUR ROUNDS / SELECT ONE TO ENTER</div>
+  ${renderResumeDock()}
   <div class="round-strip">${ROUNDS.map((r,i)=>`<button type="button" class="round-tile" data-action="open-round" data-index="${i}"><span class="rnum">${two(i+1)}</span><span><strong>${esc(r.short)}</strong><small>${r.count} QUESTIONS&nbsp; ↗</small></span></button>`).join('')}</div>
  </section>`;
 }
@@ -1089,10 +1138,12 @@ function handleAction(button){
  if(name==='review-first-open'){
   const first=QUESTIONS.find(q=>!isAnswered(q));if(first)navigate(first.id);return
  }
- if(name==='home'){state.view='intro';render();return}
+ if(name==='home'){state.view='intro';persist();render();return}
+ if(name==='resume-last'){navigate(state.current);return}
+ if(name==='resume-next'){const id=nextOpenQuestion();if(id)navigate(id);else{state.view='review';persist();render()}return}
  if(name==='start'){state.pendingRound=0;state.view='round';render();return}
  if(name==='open-round'){state.pendingRound=Number(button.dataset.index);state.view='round';render();return}
- if(name==='enter-round'){state.current=ROUNDS[state.pendingRound].start;state.view='question';render();return}
+ if(name==='enter-round'){state.current=ROUNDS[state.pendingRound].start;state.view='question';persist();render();return}
  if(name==='jump'){navigate(Number(button.dataset.q));return}
  if(name==='next'){next();return}
  if(name==='back'){back();return}
@@ -1146,10 +1197,11 @@ function handleAction(button){
  if(name==='copy-brief'){copyTextValue(exportBrief(),'CONDENSED BRIEF COPIED.');return}
  if(name==='print-review'){window.print();return}
  if(name==='reset-open'){$('#resetDialog').showModal();return}
+ if(name==='reset-backup'){downloadFile('THRESHOLD_responses.json',JSON.stringify(exportObject(),null,2),'application/json');return}
  if(name==='cancel-reset'){$('#resetDialog').close();return}
  if(name==='confirm-reset'){
   const saveWasOn=state.autosave;try{localStorage.removeItem(STORAGE_KEY)}catch(e){}
-  state=newState();state.autosave=saveWasOn;if(state.autosave)persist();
+  state=newState();state.autosave=saveWasOn;persist();
   $('#resetDialog').close();render();toast('ALL ANSWERS CLEARED.');return;
  }
  if(name==='select-manual'){const ta=$('#manualCopy');ta.focus();ta.select();return}

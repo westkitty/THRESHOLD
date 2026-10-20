@@ -66,3 +66,10 @@ The blank interactive questionnaire and a completed dossier are **two different 
 - **Continue editing on another device:** use the blank questionnaire and a `.json` or password-protected `.thx` backup. The read-only dossier is **not** a resumable editable backup.
 
 **Privacy:** the completed HTML dossier contains the responses as readable, unencrypted text. It is generated locally only when requested, makes no network requests, and does not become part of the Git repository. The `.gitignore` protects the default dossier filename from accidental staging. The automated browser tests check its actual downloaded bytes, open the generated dossier through `file://`, verify the 25 questions and 50-topic limits index, and reject executable user-input markup.
+## Resume and saved progress
+
+An in-progress session now opens with **RESUME / QUESTION NN** as its primary action, a progress dock, and **NEXT OPEN** for the first unanswered question. The original Round I option remains available. When **SAVE ON DEVICE** is enabled, the active question number is stored with answers and restored after reopening. Older saved sessions without a position open at their first unanswered question.
+
+When device saving is off, work remains in the open tab only. A browser leave-warning is requested after an answer is entered, but this is not a backup and may not appear on mobile or forced app closure. Download a JSON or encrypted THX backup for durable portability.
+
+The existing reset dialog now offers **DOWNLOAD BACKUP** without clearing anything. Clearing only occurs through the separate existing reset action. Automated checks cover reload, legacy sessions, navigation, backup-before-reset, and complete erasure.

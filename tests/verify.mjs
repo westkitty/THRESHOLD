@@ -35,6 +35,13 @@ assert.match(html, /<meta name="viewport"/);
 assert.match(html, /prefers-reduced-motion/);
 assert.match(html, /COPY ALL ANSWERS/);
 assert.match(html, /function renderSignalDeck/);
+assert.match(html, /function renderResumeDock/);
+assert.match(html, /function syncExitGuard/);
+assert.match(html, /current:state.current/);
+assert.match(html, /data-action="resume-last"/);
+assert.match(html, /data-action="resume-next"/);
+assert.match(html, /data-action="reset-backup"/);
+
 assert.match(html, /function buildStandaloneDossier/);
 assert.match(html, /function exportBrief/);
 assert.match(html, /data-action="download-dossier"/);

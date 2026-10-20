@@ -223,6 +223,53 @@ async function main(){
  check('typed HTML remains inert text',await js('!window.__injected&&document.querySelector("#answerText").value.startsWith("<img")'));
  await js('state.view="review";render()');await click('[data-action=reset-open]');await click('[data-action=confirm-reset]');
  check('clear all removes answers and limits',await js('state.view==="intro"&&Object.keys(state.answers).length===0&&Object.keys(state.limits).length===0&&state.custom.length===0'));
+
+ // Session continuity: do not write sensitive data unless the existing opt-in is enabled.
+ if(await js('state.autosave'))await click('#saveToggle');
+ check('blank session has no leave warning',await js('(()=>{const e=new Event("beforeunload",{cancelable:true});window.dispatchEvent(e);return !e.defaultPrevented&&!exitGuardActive})()'));
+ await js('(()=>{navigate(8);const a=document.querySelector("#answerText");a.value="Kept in this tab only";a.dispatchEvent(new Event("input",{bubbles:true}));return true})()');
+ check('unsaved meaningful work arms conditional leave warning',await js('(()=>{const e=new Event("beforeunload",{cancelable:true});window.dispatchEvent(e);return e.defaultPrevented&&exitGuardActive&&!localStorage.getItem(STORAGE_KEY)})()'));
+ await js('state.view="intro";render()');
+ check('resume dock appears for in-memory session',await js('document.querySelectorAll(".resume-dock").length===1&&document.querySelector(".resume-dock").textContent.includes("THIS OPEN TAB")'));
+ check('primary cover button becomes resume instead of restart',await js('document.querySelector(".cover-actions .btn-primary").dataset.action==="resume-last"&&!!document.querySelector(".cover-actions [data-action=start]")'));
+ await click('[data-action=resume-last]');
+ check('resume-last opens the last active question',await js('state.view==="question"&&state.current===8'));
+ await click('#saveToggle');
+ check('opt-in device save records the current question',await js('state.autosave===true&&JSON.parse(localStorage.getItem(STORAGE_KEY)).current===8&&!exitGuardActive'));
+ await js('navigate(12)');
+ check('question navigation updates persisted position',await js('JSON.parse(localStorage.getItem(STORAGE_KEY)).current===12'));
+ await send('Page.reload',{ignoreCache:true});await delay(470);
+ check('reopen restores position and shows resume action',await js('state.view==="intro"&&state.current===12&&document.querySelector("[data-action=resume-last]")!==null'));
+ await click('[data-action=resume-last]');
+ check('resume from reloaded browser opens question 12',await js('state.current===12&&state.view==="question"'));
+ await js('state.view="intro";render()');
+ await click('[data-action=resume-next]');
+ check('next-open navigation finds earliest unanswered question',await js('state.current===1&&state.view==="question"'));
+ await click('#saveToggle');
+ check('disabling device save removes disk copy and re-arms warning',await js('(()=>{const e=new Event("beforeunload",{cancelable:true});window.dispatchEvent(e);return !state.autosave&&!localStorage.getItem(STORAGE_KEY)&&exitGuardActive&&e.defaultPrevented})()'));
+ await js('(()=>{state.view="review";render();window.__resetBackupNames=[];const originalURL=URL.createObjectURL.bind(URL);URL.createObjectURL=blob=>{window.__resetBackupBlob=blob;return originalURL(blob)};HTMLAnchorElement.prototype.click=function(){window.__resetBackupNames.push(this.download)};document.querySelector("[data-action=reset-open]").click();return true})()');
+ await click('[data-action=reset-backup]');
+ check('reset dialog offers a backup without clearing current answers',await js('document.querySelector("#resetDialog").open&&state.answers[8].text==="Kept in this tab only"&&window.__resetBackupNames.includes("THRESHOLD_responses.json")'));
+ check('reset backup holds the actual response record',await js('(async()=>{const content=JSON.parse(await window.__resetBackupBlob.text());return content.rounds[0].questions[7].response==="Kept in this tab only"&&content.rounds.reduce((n,r)=>n+r.questions.length,0)===25})()'));
+ await click('[data-action=cancel-reset]');
+ await js('state.view="intro";render()');
+ await js('state.view="intro";render()');
+ await send('Emulation.setDeviceMetricsOverride',{width:360,height:780,deviceScaleFactor:2,mobile:true});await delay(160);
+ check('resume dock fits mobile viewport',await js('document.documentElement.scrollWidth<=innerWidth+2&&document.querySelector(".resume-dock").getBoundingClientRect().right<=innerWidth+2'));
+ await js('document.querySelector(".resume-dock").scrollIntoView({block:"center",behavior:"instant"})');await delay(160);
+ await screenshot('threshold-resume-dock-mobile');
+ await screenshot('threshold-resume-mobile');
+ await send('Emulation.setDeviceMetricsOverride',{width:1280,height:800,deviceScaleFactor:1,mobile:false});
+ await click('[data-action=reset-open]');await click('[data-action=confirm-reset]');
+ check('explicit reset clears all data and detaches leave warning',await js('(()=>{const e=new Event("beforeunload",{cancelable:true});window.dispatchEvent(e);return answeredCount()===0&&!exitGuardActive&&!e.defaultPrevented&&!localStorage.getItem(STORAGE_KEY)})()'));
+ check('blank cover still starts at round one',await js('document.querySelector(".cover-actions .btn-primary").dataset.action==="start"&&!document.querySelector(".resume-dock")'));
+ // Older autosave files lacked current: resume the first unanswered question, not a random position.
+ await js('localStorage.setItem(STORAGE_KEY,JSON.stringify({autosave:true,answers:{1:{text:"Existing first answer",chosen:[],values:{}}},limits:{},custom:[]}))');
+ await send('Page.reload',{ignoreCache:true});await delay(440);
+ check('legacy autosave resumes at first unanswered position',await js('state.autosave===true&&state.current===2&&state.view==="intro"&&!!document.querySelector(".resume-dock")'));
+ await js('state.view="intro";render()');await click('[data-action=reset-open]');await click('[data-action=confirm-reset]');
+ check('legacy reset preserves clean state',await js('answeredCount()===0&&state.current===1&&JSON.parse(localStorage.getItem(STORAGE_KEY)).current===1'));
+
  check('zero unhandled browser errors',errs.length===0);
  check('no external requests',net.every(x=>x.startsWith('file:')||x.startsWith('data:')));
  const nav=await send('Page.navigate',{url:pathToFileURL(dossierPath).href});
