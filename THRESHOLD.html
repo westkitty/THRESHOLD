@@ -359,6 +359,57 @@ input,textarea,select,button,summary{scroll-margin-bottom:115px}
 .resume-dock-actions .btn{width:100%;min-height:58px}
 @media(max-width:760px){.resume-dock{grid-template-columns:1fr;gap:19px;margin-bottom:24px}.resume-big strong{font-size:82px}.resume-dock-actions .btn{font-size:10px;letter-spacing:.04em;gap:9px;padding:14px 12px}}
 @media print{.resume-dock{display:none!important}}
+
+/* iPhone compatibility: native-sized inputs and stable dialogs, without removing desktop controls. */
+.mobile-share-line{display:flex;flex-direction:column;gap:8px}
+.mobile-share-line .btn{min-height:45px;width:100%;justify-content:center}
+@supports (-webkit-touch-callout:none){
+ .field-input,.field-select,.topic-status,.note-area,.dialog-text,
+ #newLimit,#importFile,.lock-fields input,#importPass, .answer-area{font-size:16px!important}
+ button,select,summary,input[type=range]{touch-action:manipulation}
+ .limit-scroller,.session-body,.dialog-body{ -webkit-overflow-scrolling:touch }
+}
+@media(hover:none) and (pointer:coarse){
+ .field-input,.field-select,.topic-status,.note-area,.dialog-text,
+ #newLimit,#importFile,.lock-fields input,#importPass,.answer-area{font-size:16px!important}
+ .topic-status,.field-select{min-height:48px}
+ .note-details summary{min-height:44px;display:flex;align-items:center;gap:8px}
+ .scale-nudge{min-width:44px;min-height:44px}
+ button:focus-visible,summary:focus-visible{outline-offset:3px}
+}
+@media(max-width:580px){
+ .cover-grid,.cover-copy,.cover-grid > *{min-width:0;max-width:100%}
+ .cover-copy{width:100%}
+ .cover-title{font-size:clamp(47px,13.9vw,70px);white-space:nowrap;transform:none}
+ .cover-explainer,.cover-instruction{max-width:100%;overflow-wrap:break-word}
+ .mast{padding-top:max(0px,env(safe-area-inset-top));height:auto;min-height:66px}
+ .question-actions{padding-bottom:calc(13px + env(safe-area-inset-bottom,0px));}
+ .site-footer{padding-bottom:calc(22px + env(safe-area-inset-bottom,0px));}
+ dialog{width:calc(100% - 20px);max-width:calc(100% - 20px);max-height:calc(100dvh - 30px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow-y:auto}
+ .dialog-body,.session-body{max-height:calc(100dvh - 36px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow-y:auto}
+ .dialog-actions .btn{flex:1 1 100%;min-height:48px}
+ .review .export-bar .btn{min-height:46px}
+ .limit-scroller{overscroll-behavior:contain}
+ .review-limit-row{min-width:0;max-width:100%;gap:8px}
+ .review-limit-row > div:first-child{min-width:0;flex:1 1 auto}
+ .review-limit-row strong,.review-limit-row small{white-space:normal;overflow-wrap:anywhere;word-break:break-word}
+ .review-limit-row .right{flex:0 1 42%;max-width:42%;white-space:normal;overflow-wrap:anywhere}
+ .review-item,.review-q,.review-answer{overflow-wrap:anywhere}
+ .mobile-share-line{grid-column:1/-1}
+ .session-toggle,.save-toggle{min-height:44px}
+}
+@media(max-width:390px){
+ .limit-toolbar{gap:9px}
+ .limit-grid{grid-template-columns:1fr}
+ .limit-card{padding:14px 12px}
+ .topic-status{width:100%}
+ .delivery-band .btn,.mobile-share-line .btn{letter-spacing:.03em}
+}
+@media(prefers-reduced-motion:reduce){
+ .stage-enter{animation:none!important}
+}
+@media(hover:none) and (pointer:coarse){body::before{display:none}dialog::backdrop{backdrop-filter:none}}
+
 </style>
 </head>
 <body>
@@ -379,7 +430,7 @@ input,textarea,select,button,summary{scroll-margin-bottom:115px}
 <div><label for="lockConfirm">REPEAT PASSPHRASE</label><input id="lockConfirm" type="password" autocomplete="new-password" spellcheck="false"></div></div>
 <p class="lock-hint">Keep this passphrase. The encrypted .thx file cannot be restored without it. The passphrase is not stored by THRESHOLD.</p>
 <p class="lock-status" id="lockMessage" role="status"></p>
-<div class="dialog-actions"><button type="button" class="btn btn-quiet" data-action="lock-close">CANCEL</button><button type="button" class="btn btn-primary" data-action="lock-write" id="lockSave">ENCRYPT + SAVE ↓</button></div>
+<div class="dialog-actions"><button type="button" class="btn btn-quiet" data-action="lock-close">CANCEL</button><button type="button" class="btn btn-primary" data-action="lock-write" id="lockSave">ENCRYPT + SAVE ↓</button><button type="button" class="btn btn-quiet" data-action="lock-share">ENCRYPT + SHARE ↗</button></div><div id="lockReady" class="locked-open" hidden><h3>ENCRYPTION COMPLETE.</h3><p class="lock-hint">Use one of these buttons to deliver the encrypted file. The passphrase is no longer needed in this window.</p><div class="dialog-actions"><button type="button" class="btn btn-primary" data-action="lock-ready-save">SAVE .THX TO FILES ↓</button><button type="button" class="btn btn-quiet" data-action="lock-ready-share">SHARE ENCRYPTED FILE ↗</button></div></div>
 </div></dialog>
 <dialog id="resetDialog" aria-labelledby="resetTitle"><div class="dialog-body"><div class="overline">CLEAR SESSION</div><h2 id="resetTitle">ERASE RESPONSES?</h2><p>This clears every answer, selection, and custom limit in this browser session, including locally saved answers.</p><div class="dialog-actions"><button class="btn btn-quiet" type="button" data-action="cancel-reset">KEEP RESPONSES</button><button class="btn btn-quiet" type="button" data-action="reset-backup">DOWNLOAD BACKUP ↓</button><button class="btn btn-primary" type="button" data-action="confirm-reset">CLEAR EVERYTHING <span class="arrow">→</span></button></div></div></dialog>
 <dialog id="copyDialog" aria-labelledby="copyTitle"><div class="dialog-body"><div class="overline">MANUAL COPY</div><h2 id="copyTitle">YOUR COMPLETE RECORD.</h2><p>Your browser didn't allow automatic copying. Select the text below and copy it manually.</p><textarea id="manualCopy" class="dialog-text" readonly aria-label="Complete response text for manual copying"></textarea><div class="dialog-actions"><button class="btn btn-primary" type="button" data-action="select-manual">SELECT ALL TEXT <span class="arrow">↗</span></button><button class="btn btn-quiet" type="button" data-action="close-copy">CLOSE</button></div></div></dialog>
@@ -546,12 +597,12 @@ function render(){
 }
 
 // Session index and portable offline restore
-let pendingImport=null;
+let pendingImport=null,importGeneration=0;
 function renderSessionPanel(){
  const filled=answeredCount(),hard=hardCount(),classed=classifiedCount();
  return `<div class="session-numbers"><div class="session-number"><b>${filled}/25</b><span>QUESTIONS TOUCHED</span></div><div class="session-number"><b>${classed}</b><span>TOPICS CLASSIFIED</span></div><div class="session-number"><b>${hard}</b><span>HARD LIMITS MARKED</span></div></div>
  ${ROUNDS.map(r=>`<div class="session-round"><div class="session-round-label"><span>${r.n} / ${esc(r.short)}</span><span>${QUESTIONS.filter(q=>q.id>=r.start&&q.id<=r.end&&isAnswered(q)).length} / ${r.end-r.start+1}</span></div><div class="session-questions">${QUESTIONS.filter(q=>q.id>=r.start&&q.id<=r.end).map(q=>`<button class="session-jump ${isAnswered(q)?'answered':''}" data-action="session-jump" data-q="${q.id}" type="button" aria-label="Go to question ${q.id}, ${isAnswered(q)?'answered':'not yet answered'}">${two(q.id)}</button>`).join('')}</div></div>`).join('')}
- <div class="session-actions"><button class="btn btn-primary" type="button" data-action="session-backup">SAVE JSON COPY ↓</button><button class="btn btn-primary" type="button" data-action="lock-open">ENCRYPTED BACKUP ↓</button><button class="btn btn-quiet" type="button" data-action="import-open">RESTORE JSON ↑</button><button class="btn btn-quiet" type="button" data-action="session-review">REVIEW RECORD ↗</button><button class="btn btn-quiet" type="button" data-action="session-reset">CLEAR RECORD</button></div>
+ <div class="session-actions"><button class="btn btn-primary" type="button" data-action="session-backup">SAVE JSON COPY ↓</button><button class="btn btn-quiet" type="button" data-action="share-json">SHARE SESSION BACKUP ↗</button><button class="btn btn-primary" type="button" data-action="lock-open">ENCRYPTED BACKUP ↓</button><button class="btn btn-quiet" type="button" data-action="import-open">RESTORE JSON ↑</button><button class="btn btn-quiet" type="button" data-action="session-review">REVIEW RECORD ↗</button><button class="btn btn-quiet" type="button" data-action="session-reset">CLEAR RECORD</button></div>
  <p class="control-hint" style="margin-top:19px">SAVE ON DEVICE: ${state.autosave?'ON':'OFF'} — Device saving and portable JSON copies are separate.</p>`;
 }
 function openSession(){
@@ -608,7 +659,7 @@ function validatePortableJSON(doc){
 
 const LOCK_FORMAT='THRESHOLD-LOCKED';
 const LOCK_ITERATIONS=210000;
-let pendingLocked=null;
+let pendingLocked=null,lockGeneration=0,pendingEncryptedExport=null;
 function browserCryptoReady(){
  return typeof crypto!=='undefined'&&Boolean(crypto.subtle)&&typeof crypto.getRandomValues==='function';
 }
@@ -647,24 +698,35 @@ async function unsealSession(payload,passphrase){
  return new TextDecoder('utf-8',{fatal:true}).decode(plain);
 }
 function openLockDialog(){
+ ++lockGeneration;pendingEncryptedExport=null;$('#lockReady').hidden=true;
  const dialog=$('#lockDialog');
  $('#lockPass').value='';$('#lockConfirm').value='';
  $('#lockMessage').textContent=browserCryptoReady()?'Passphrase is never stored. Keep it to open this file later.':'This browser cannot encrypt an offline file.';
  $('#lockSave').disabled=!browserCryptoReady();
  dialog.showModal();$('#lockPass').focus();
 }
-async function writeLockedBackup(){
- const message=$('#lockMessage'),pass=$('#lockPass').value,confirmation=$('#lockConfirm').value,button=$('#lockSave');
+async function writeLockedBackup(share=false){
+ const message=$('#lockMessage'),pass=$('#lockPass').value,confirmation=$('#lockConfirm').value,button=$('#lockSave'),generation=lockGeneration;
  if(pass!==confirmation){message.textContent='The two passphrases do not match.';return}
  if(pass.length<8){message.textContent='Use at least eight characters.';return}
  button.disabled=true;message.textContent='ENCRYPTING ON THIS DEVICE…';
  try{
   const content=await sealSession(pass);
-  downloadFile('THRESHOLD_locked.thx',content,'application/json');
+  if(generation!==lockGeneration||!$('#lockDialog').open)return;
+  if(window.matchMedia('(hover:none) and (pointer:coarse)').matches){
+   // Native sharing needs a *fresh* tap after asynchronous key derivation.
+   pendingEncryptedExport=content;
+   $('#lockReady').hidden=false;
+   message.textContent='ENCRYPTION COMPLETE. TAP SAVE OR SHARE TO FINISH.';
+   $('#lockPass').value='';$('#lockConfirm').value='';
+   return;
+  }
+  if(share)await shareRecord('THRESHOLD_locked.thx',content,'application/json');
+  else downloadFile('THRESHOLD_locked.thx',content,'application/json');
   $('#lockPass').value='';$('#lockConfirm').value='';$('#lockDialog').close();
-  toast('ENCRYPTED BACKUP PREPARED.');
- }catch(error){message.textContent=error?.message||'Encrypted backup failed.'}
- finally{button.disabled=false}
+  if(!share)toast('ENCRYPTED BACKUP PREPARED.');
+ }catch(error){if(generation===lockGeneration)message.textContent=error?.message||'Encrypted backup failed.'}
+ finally{if(generation===lockGeneration)button.disabled=false}
 }
 function showImportSummary(record){
  pendingImport=record;
@@ -676,17 +738,20 @@ function showImportSummary(record){
 async function unlockImportedRecord(){
  const message=$('#importMessage'),password=$('#importPass'),button=$('#importUnlockButton');
  if(!pendingLocked)return;
+ const generation=importGeneration,encrypted=pendingLocked;
  if(!password.value){message.textContent='Enter the backup passphrase.';password.focus();return}
  button.disabled=true;message.textContent='UNLOCKING ON THIS DEVICE…';
  try{
-  const decrypted=await unsealSession(pendingLocked,password.value);
+  const decrypted=await unsealSession(encrypted,password.value);
+  if(generation!==importGeneration)return;
   const record=validatePortableJSON(JSON.parse(decrypted));
   pendingLocked=null;password.value='';$('#importUnlock').hidden=true;
   showImportSummary(record);
- }catch(error){message.textContent='Unable to unlock this file. Check the passphrase or the file contents.'}
- finally{button.disabled=false}
+ }catch(error){if(generation===importGeneration)message.textContent='Unable to unlock this file. Check the passphrase or the file contents.'}
+ finally{if(generation===importGeneration)button.disabled=false}
 }
 async function selectImportFile(file){
+ const generation=++importGeneration;
  pendingImport=null;pendingLocked=null;
  const apply=$('#importApply'),info=$('#importMessage'),details=$('#importDetails'),unlock=$('#importUnlock');
  apply.disabled=true;details.hidden=true;details.textContent='';unlock.hidden=true;$('#importPass').value='';
@@ -697,6 +762,7 @@ async function selectImportFile(file){
   const content=typeof file.text==='function'?await file.text():await new Promise((resolve,reject)=>{
    const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('Unable to read file'));reader.readAsText(file);
   });
+  if(generation!==importGeneration)return;
   const data=JSON.parse(content);
   if(data?.format===LOCK_FORMAT){
    if(!browserCryptoReady())throw Error('Encrypted restore is not supported in this browser.');
@@ -705,11 +771,12 @@ async function selectImportFile(file){
    $('#importPass').focus();return;
   }
   showImportSummary(validatePortableJSON(data));
- }catch(error){info.textContent=error instanceof SyntaxError?'Not a valid JSON record.':error?.message||'Unable to open record.'}
+ }catch(error){if(generation===importGeneration)info.textContent=error instanceof SyntaxError?'Not a valid JSON record.':error?.message||'Unable to open record.'}
 }
 
 function applyImport(){
  if(!pendingImport)return;
+ ++importGeneration;
  const record=pendingImport;
  state.answers=record.answers;state.limits=record.limits;state.custom=record.custom;
  state.filter={query:'',category:'ALL',status:'ALL'};state.current=QUESTIONS.find(q=>!isAnswered(q))?.id||25;state.pendingRound=0;state.view='intro';state.reviewFilter='ALL';
@@ -1074,6 +1141,7 @@ function renderReview(){
 <div class="delivery-identity"><div class="delivery-band-label">OFFLINE / COMPLETE / ONE FILE</div><h2>THE WHOLE<br><em>RECORD.</em></h2>
 <p>Make this completed questionnaire a standalone, read-only HTML dossier. Every original question, written response and limits classification travels inside the one file.</p></div>
 <div class="delivery-buttons"><button type="button" class="btn btn-primary" data-action="download-dossier">EXPORT THE DOSSIER .HTML <span class="arrow">↗</span></button>
+<div class="mobile-share-line" aria-label="Save or share completed records"><button type="button" class="btn btn-quiet" data-action="share-json">SAVE / SHARE JSON ↗</button><button type="button" class="btn btn-quiet" data-action="share-txt">SAVE / SHARE TXT ↗</button><button type="button" class="btn btn-quiet" data-action="share-dossier">SAVE / SHARE HTML ↗</button></div>
 <button type="button" class="btn btn-quiet" data-action="copy-brief">COPY CONDENSED BRIEF <span class="arrow">↗</span></button>
 <p class="delivery-caption">The exported dossier includes readable personal answers. It is not encrypted. The original questionnaire remains editable and unchanged.</p></div>
 </section>
@@ -1134,10 +1202,36 @@ function exportText(){
  lines.push('','END OF RECORD');
  return lines.join('\n');
 }
+async function shareRecord(filename,content,type){
+ const mime=type+';charset=utf-8';
+ let record;
+ try{record=new File([content],filename,{type:mime});}catch(error){downloadFile(filename,content,type);return}
+ let supported=false;
+ try{supported=!!(navigator.share&&navigator.canShare&&navigator.canShare({files:[record]}));}catch(error){}
+ if(!supported){downloadFile(filename,content,type);return 'download'}
+ try{
+  await navigator.share({files:[record],title:'THRESHOLD — '+filename});
+  toast('FILE SHARED.');return 'shared';
+ }catch(error){
+  if(error&&error.name==='AbortError'){toast('SHARING CANCELLED.');return 'cancelled'}
+  // Sharing was unavailable in this browser; offer an ordinary file download.
+  downloadFile(filename,content,type);return 'download';
+ }
+}
+async function finishEncryptedExport(share){
+ if(!pendingEncryptedExport)return;
+ const content=pendingEncryptedExport;
+ if(share){
+  const outcome=await shareRecord('THRESHOLD_locked.thx',content,'application/json');
+  if(outcome==='cancelled')return;
+ }else downloadFile('THRESHOLD_locked.thx',content,'application/json');
+ pendingEncryptedExport=null;
+ $('#lockDialog').close();
+}
 function downloadFile(filename,content,type){
  const blob=new Blob([content],{type:type+';charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
  a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();
- setTimeout(()=>URL.revokeObjectURL(url),3500);toast(filename+' prepared.');
+ setTimeout(()=>URL.revokeObjectURL(url),30000);toast(filename+' download requested.');
 }
 function showCopyFallback(value){
  const dlg=$('#copyDialog'),ta=$('#manualCopy');$('#copyTitle').textContent=value.startsWith('THRESHOLD / CONDENSED BRIEF')?'CONDENSED BRIEF.':'YOUR COMPLETE RECORD.';ta.value=value;dlg.showModal();ta.focus();ta.select();
@@ -1175,8 +1269,11 @@ function handleAction(button){
  }
  if(name==='signal-first-open'){const q=QUESTIONS.find(q=>!isAnswered(q));if(q)navigate(q.id);else toast('ALL 25 QUESTIONS ENGAGED.');return}
  if(name==='lock-open'){const d=$('#sessionDialog');if(d.open)d.close();openLockDialog();return}
- if(name==='lock-close'){$('#lockDialog').close();return}
+ if(name==='lock-close'){++lockGeneration;$('#lockDialog').close();return}
  if(name==='lock-write'){writeLockedBackup();return}
+ if(name==='lock-share'){writeLockedBackup(true);return}
+ if(name==='lock-ready-save'){finishEncryptedExport(false);return}
+ if(name==='lock-ready-share'){finishEncryptedExport(true);return}
  if(name==='import-unlock'){unlockImportedRecord();return}
  if(name==='session-close'){$('#sessionDialog').close();return}
  if(name==='session-jump'){$('#sessionDialog').close();navigate(Number(button.dataset.q));return}
@@ -1184,12 +1281,13 @@ function handleAction(button){
  if(name==='session-backup'){downloadFile('THRESHOLD_responses.json',JSON.stringify(exportObject(),null,2),'application/json');return}
  if(name==='session-reset'){$('#sessionDialog').close();$('#resetDialog').showModal();return}
  if(name==='import-open'){
+  ++importGeneration;
   const d=$('#sessionDialog');if(d.open)d.close();
   pendingImport=null;pendingLocked=null;$('#importFile').value='';$('#importMessage').textContent='No file selected.';$('#importPass').value='';$('#importUnlock').hidden=true;
   $('#importDetails').hidden=true;$('#importApply').disabled=true;
   $('#importDialog').showModal();return;
  }
- if(name==='import-close'){pendingImport=null;pendingLocked=null;$('#importPass').value='';$('#importDialog').close();return}
+ if(name==='import-close'){++importGeneration;pendingImport=null;pendingLocked=null;$('#importPass').value='';$('#importDialog').close();return}
  if(name==='import-apply'){applyImport();return}
  if(name==='review-filter'){updateReviewFilter(button.dataset.filter);return}
  if(name==='review-first-open'){
@@ -1250,6 +1348,9 @@ function handleAction(button){
  if(name==='copy'){copyAll();return}
  if(name==='download-txt'){downloadFile('THRESHOLD_responses.txt',exportText(),'text/plain');return}
  if(name==='download-json'){downloadFile('THRESHOLD_responses.json',JSON.stringify(exportObject(),null,2),'application/json');return}
+ if(name==='share-json'){shareRecord('THRESHOLD_responses.json',JSON.stringify(exportObject(),null,2),'application/json');return}
+ if(name==='share-txt'){shareRecord('THRESHOLD_responses.txt',exportText(),'text/plain');return}
+ if(name==='share-dossier'){shareRecord('THRESHOLD_dossier.html',buildStandaloneDossier(),'text/html');return}
  if(name==='download-dossier'){downloadFile('THRESHOLD_dossier.html',buildStandaloneDossier(),'text/html');return}
  if(name==='copy-brief'){copyTextValue(exportBrief(),'CONDENSED BRIEF COPIED.');return}
  if(name==='print-review'){window.print();return}
@@ -1280,7 +1381,12 @@ document.addEventListener('input',e=>{
   const clear=$('[data-action="clear-control"]');if(clear)clear.disabled=false;
   scheduleInputSave();updateAnsweredMarker(id);return;
  }
- if(t.matches('[data-topic-note]')){getLimit(t.dataset.topicNote).note=t.value;scheduleInputSave();return}
+ if(t.matches('[data-topic-note]')){
+  getLimit(t.dataset.topicNote).note=t.value;
+  const summary=t.closest('details')?.querySelector('summary');
+  if(summary)summary.textContent=t.value.trim()?'EDIT NOTE':'ADD NOTE';
+  scheduleInputSave();updateAnsweredMarker(25);return;
+ }
  if(t.id==='limitSearch'){state.filter.query=t.value;applyLimitFilter();return}
 });
 document.addEventListener('change',e=>{
@@ -1305,8 +1411,8 @@ document.addEventListener('keydown',e=>{
  if(e.altKey&&e.key==='ArrowRight'&&state.view==='question'){e.preventDefault();next()}
  if(e.altKey&&e.key==='ArrowLeft'&&state.view==='question'){e.preventDefault();back()}
 });
-$('#importDialog').addEventListener('close',()=>{pendingImport=null;pendingLocked=null;$('#importPass').value='';$('#importApply').disabled=true});
-$('#lockDialog').addEventListener('close',()=>{$('#lockPass').value='';$('#lockConfirm').value=''});
+$('#importDialog').addEventListener('close',()=>{++importGeneration;pendingImport=null;pendingLocked=null;$('#importPass').value='';$('#importApply').disabled=true});
+$('#lockDialog').addEventListener('close',()=>{++lockGeneration;pendingEncryptedExport=null;$('#lockPass').value='';$('#lockConfirm').value=''});
 render();
 </script>
 </body>
