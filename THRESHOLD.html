@@ -465,18 +465,38 @@ function syncExitGuard(){
  else window.removeEventListener('beforeunload',warnBeforeLeaving);
  exitGuardActive=unprotected;
 }
+let pendingSaveTimer=null,lastInputSave=0;
 function persist(){
+ if(pendingSaveTimer!==null){clearTimeout(pendingSaveTimer);pendingSaveTimer=null}
  syncExitGuard();
  if(!state.autosave)return;
- try{localStorage.setItem(STORAGE_KEY,JSON.stringify({autosave:true,answers:state.answers,limits:state.limits,custom:state.custom,current:state.current,view:'intro'}))}
- catch(e){state.autosave=false;syncExitGuard();refreshHeader();toast('Device saving is unavailable in this browser. Answers remain in this session.')}
+ try{
+  localStorage.setItem(STORAGE_KEY,JSON.stringify({autosave:true,answers:state.answers,limits:state.limits,custom:state.custom,current:state.current,view:'intro'}));
+ }catch(e){state.autosave=false;syncExitGuard();refreshHeader();toast('Device saving is unavailable in this browser. Answers remain in this session.')}
 }
+function scheduleInputSave(){
+ syncExitGuard();
+ if(!state.autosave)return;
+ // Save the first edit immediately. Batch later edits up to 180ms apart.
+ const now=performance.now(),remaining=180-(now-lastInputSave);
+ if(lastInputSave===0||remaining<=0){lastInputSave=now||0.001;persist();return}
+ if(pendingSaveTimer===null)pendingSaveTimer=setTimeout(()=>{
+  persist();lastInputSave=performance.now();
+ },remaining);
+}
+// Flush pending input on background/exit. No new storage when the user opted out.
+window.addEventListener('pagehide',()=>{if(pendingSaveTimer!==null)persist()});
+document.addEventListener('visibilitychange',()=>{
+ if(document.visibilityState==='hidden'&&pendingSaveTimer!==null)persist();
+});
 function enableSave(){
  if(state.autosave){
-  state.autosave=false;try{localStorage.removeItem(STORAGE_KEY)}catch(e){}
+  state.autosave=false;lastInputSave=0;
+  if(pendingSaveTimer!==null){clearTimeout(pendingSaveTimer);pendingSaveTimer=null}
+  try{localStorage.removeItem(STORAGE_KEY)}catch(e){}
   syncExitGuard();refreshHeader();toast('Device saving switched off.');return
  }
- state.autosave=true;persist();refreshHeader();
+ state.autosave=true;lastInputSave=0;persist();refreshHeader();
  if(state.autosave)toast('Responses will be saved in this browser.');
 }
 function refreshHeader(){
@@ -518,6 +538,8 @@ function render(){
  else html=renderQuestion(state.current);
  screen.innerHTML=`<div class="stage-enter">${html}</div>`;
  if(state.view==='review'){const pre=$('#exportPreview');if(pre)pre.value=exportText();updateReviewFilter(state.reviewFilter)}
+ if(state.view==='question'&&state.current===25)applyLimitFilter();
+ else resetLimitCardCache();
  const nextHeading=state.view==='question'?$('#activeQuestion'):state.view==='review'?$('.review-title'):state.view==='round'?$('.interlude-title'):null;
  if(nextHeading){nextHeading.setAttribute('tabindex','-1');nextHeading.focus({preventScroll:true})}
  window.scrollTo({top:0,behavior:'instant'});
@@ -801,7 +823,7 @@ function renderLimits(){
  <select id="limitFilter" class="field-select" aria-label="Filter limit topics by classification"><option value="ALL">EVERY STATUS</option><option value="UNCLASSIFIED" ${state.filter.status==='UNCLASSIFIED'?'selected':''}>UNCLASSIFIED</option>${STATUS.map(s=>`<option value="${esc(s)}" ${s===state.filter.status?'selected':''}>${esc(s)}</option>`).join('')}</select>
  </div>
  <div class="limit-info" id="limitInfo"><span>SHOWING <strong>${selectedTopics().length}</strong> / ${allLimits().length} TOPICS</span><span>SCROLL TO EXPLORE &#8595;</span></div>
- <div class="limit-scroller" id="limitScroll" aria-label="Limit topic list"><div class="limit-grid" id="limitCards">${renderLimitCards()}</div></div>
+ <div class="limit-scroller" id="limitScroll" aria-label="Limit topic list"><div class="limit-grid" id="limitCards">${renderLimitCards(allLimits())}</div></div>
  <div class="custom-title">YOUR ADDITIONS / NO FIXED LIMIT</div>
  <div class="custom-form"><input id="newLimit" class="field-input" type="text" maxlength="160" placeholder="ADD YOUR OWN TOPIC…" aria-label="Name of a new limit topic"><button type="button" class="btn btn-small btn-primary" data-action="add-custom">ADD TOPIC <span class="arrow">+</span></button></div>
  `;
@@ -814,12 +836,11 @@ function selectedTopics(){
    (!search||t.name.toLowerCase().includes(search)||t.category.toLowerCase().includes(search)||(l.note||'').toLowerCase().includes(search));
  });
 }
-function renderLimitCards(){
- const visible=selectedTopics();
+function renderLimitCards(visible=selectedTopics()){
  if(visible.length===0)return '<div class="limit-empty" style="grid-column:1/-1">NO MATCHES IN THIS VIEW.<br>CHANGE THE SEARCH OR FILTER TO SEE MORE.</div>';
  return visible.map(t=>{
   const l=getLimit(t.id),idx=t.custom?'CUSTOM':t.id.slice(1),editing=t.custom&&state.editCustom===t.id;
-  if(editing)return `<article class="limit-card"><div class="limit-index">EDIT CUSTOM TOPIC</div><input class="field-input" id="editName-${esc(t.id)}" type="text" maxlength="160" value="${esc(t.name)}" aria-label="Edit custom topic name" style="width:100%;margin-top:10px"><div class="custom-actions"><button type="button" class="btn btn-small btn-primary" data-action="save-custom" data-id="${esc(t.id)}">SAVE NAME</button><button type="button" class="btn btn-small btn-quiet" data-action="cancel-custom">CANCEL</button></div></article>`;
+  if(editing)return `<article class="limit-card" data-limit-card="${esc(t.id)}"><div class="limit-index">EDIT CUSTOM TOPIC</div><input class="field-input" id="editName-${esc(t.id)}" type="text" maxlength="160" value="${esc(t.name)}" aria-label="Edit custom topic name" style="width:100%;margin-top:10px"><div class="custom-actions"><button type="button" class="btn btn-small btn-primary" data-action="save-custom" data-id="${esc(t.id)}">SAVE NAME</button><button type="button" class="btn btn-small btn-quiet" data-action="cancel-custom">CANCEL</button></div></article>`;
   return `<article class="limit-card" data-status="${esc(l.status)}" data-limit-card="${esc(t.id)}">
    <div class="limit-row"><div class="limit-name">${esc(t.name)}</div><span class="limit-index">${esc(idx)}</span></div>
    <div class="limit-category">${esc(t.category)}</div>
@@ -830,14 +851,38 @@ function renderLimitCards(){
  }).join('');
 }
 function updateLimitStats(){const e=$('#limitStats');if(e)e.innerHTML=limitStatsMarkup()}
+// Filtering reuses the same nodes: typed notes, open details and select state survive searches.
+let limitCardHost=null,limitCardNodes=null,limitEmptyNode=null;
+function resetLimitCardCache(){limitCardHost=null;limitCardNodes=null;limitEmptyNode=null}
+function applyLimitFilter(){
+ const host=$('#limitCards');if(!host)return;
+ if(limitCardHost!==host||!limitCardNodes){
+  limitCardHost=host;
+  limitCardNodes=new Map([...host.querySelectorAll(':scope > [data-limit-card]')].map(node=>[node.dataset.limitCard,node]));
+  limitEmptyNode=document.createElement('div');
+  limitEmptyNode.className='limit-empty';
+  limitEmptyNode.style.gridColumn='1/-1';
+  limitEmptyNode.innerHTML='NO MATCHES IN THIS VIEW.<br>CHANGE THE SEARCH OR FILTER TO SEE MORE.';
+ }
+ const wanted=selectedTopics(),nodes=wanted.map(topic=>limitCardNodes.get(topic.id));
+ if(nodes.some(node=>!node))throw Error('Limits card cache is missing a topic.');
+ const next=nodes.length?nodes:[limitEmptyNode];
+ // Avoid DOM writes when a search yields the same exact visible order.
+ if(host.childElementCount!==next.length||next.some((node,i)=>host.children[i]!==node)){
+  const scroll=$('#limitScroll'),top=scroll?.scrollTop||0;
+  host.replaceChildren(...next);
+  if(scroll)scroll.scrollTop=top;
+ }
+ const info=$('#limitInfo');
+ if(info)info.innerHTML='<span>SHOWING <strong>'+wanted.length+'</strong> / '+limitCardNodes.size+' TOPICS</span><span>SCROLL TO EXPLORE &#8595;</span>';
+}
 function updateLimitCards(){
- const info=$('#limitInfo');if(info)info.innerHTML='<span>SHOWING <strong>'+selectedTopics().length+'</strong> / '+allLimits().length+' TOPICS</span><span>SCROLL TO EXPLORE &#8595;</span>';
- const e=$('#limitCards');
- if(!e)return;
- const scroller=$('#limitScroll'),top=scroller?.scrollTop||0;
- e.innerHTML=renderLimitCards();
- if(scroller)scroller.scrollTop=top;
- updateLimitStats();
+ const host=$('#limitCards');if(!host)return;
+ const scroll=$('#limitScroll'),top=scroll?.scrollTop||0;
+ // Rebuild only after a topic is added, renamed, removed or enters edit mode.
+ host.innerHTML=renderLimitCards(allLimits());
+ resetLimitCardCache();applyLimitFilter();updateLimitStats();
+ if(scroll)scroll.scrollTop=top;
 }
 
 function summarizeControl(id){
@@ -1106,6 +1151,18 @@ function updateAnsweredMarker(id){
  const bar=$('.rail-progress span');if(bar)bar.style.width=answeredCount()/25*100+'%';
 }
 function updateWordCount(value){const e=$('#wordCount');if(e)e.textContent=(value.trim()?value.trim().split(/\s+/).length:0)+' WORDS'}
+let responseFrame=null;
+function scheduleResponseLayout(textarea){
+ if(responseFrame!==null)cancelAnimationFrame(responseFrame);
+ responseFrame=requestAnimationFrame(()=>{
+  responseFrame=null;
+  if(!textarea.isConnected)return;
+  updateWordCount(textarea.value);
+  const max=Math.round(window.innerHeight*.6);
+  textarea.style.height='auto';
+  textarea.style.height=Math.max(142,Math.min(textarea.scrollHeight,max))+'px';
+ });
+}
 function handleAction(button){
  const name=button.dataset.action;
  if(name==='session-open'){openSession();return}
@@ -1214,18 +1271,17 @@ document.addEventListener('input',e=>{
  const t=e.target;
  if(t.matches('[data-answer]')){
   const id=Number(t.dataset.answer);answer(id).text=t.value;
-  updateWordCount(t.value);persist();updateAnsweredMarker(id);
-  const max=Math.round(window.innerHeight*.6);t.style.height='auto';t.style.height=Math.max(142,Math.min(t.scrollHeight,max))+'px';return;
+  scheduleResponseLayout(t);scheduleInputSave();updateAnsweredMarker(id);return;
  }
  if(t.matches('[data-scale-q]')){
   const id=Number(t.dataset.scaleQ),key=t.dataset.scaleKey,val=Number(t.value);
   answer(id).values[key]=val;
   t.style.setProperty('--amount',val*10+'%');const out=t.closest('.scale-box')?.querySelector('output');if(out)out.textContent=String(val);
   const clear=$('[data-action="clear-control"]');if(clear)clear.disabled=false;
-  persist();updateAnsweredMarker(id);return;
+  scheduleInputSave();updateAnsweredMarker(id);return;
  }
- if(t.matches('[data-topic-note]')){getLimit(t.dataset.topicNote).note=t.value;persist();return}
- if(t.id==='limitSearch'){state.filter.query=t.value;updateLimitCards();return}
+ if(t.matches('[data-topic-note]')){getLimit(t.dataset.topicNote).note=t.value;scheduleInputSave();return}
+ if(t.id==='limitSearch'){state.filter.query=t.value;applyLimitFilter();return}
 });
 document.addEventListener('change',e=>{
  const t=e.target;
@@ -1234,11 +1290,12 @@ document.addEventListener('change',e=>{
   const id=t.dataset.topicStatus;getLimit(id).status=t.value;
   const card=t.closest('.limit-card');if(card)card.dataset.status=t.value;
   persist();
-  if(state.filter.status!=='ALL')updateLimitCards();else updateLimitStats();
+  if(state.filter.status!=='ALL')applyLimitFilter();
+  updateLimitStats();
   updateAnsweredMarker(25);return;
  }
- if(t.id==='limitCategory'){state.filter.category=t.value;updateLimitCards();return}
- if(t.id==='limitFilter'){state.filter.status=t.value;updateLimitCards();return}
+ if(t.id==='limitCategory'){state.filter.category=t.value;applyLimitFilter();return}
+ if(t.id==='limitFilter'){state.filter.status=t.value;applyLimitFilter();return}
 });
 document.addEventListener('keydown',e=>{
  if(e.key==='Escape')return;
