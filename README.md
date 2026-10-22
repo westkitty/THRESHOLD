@@ -1,5 +1,7 @@
 # THRESHOLD
 
+**Launch the hosted PWA:** https://westkitty.github.io/THRESHOLD/ (Home Screen install supported; standalone HTML still available).
+
 A four-round, 25-question offline questionnaire with a 50-topic limits index.
 
 Open **[THRESHOLD.html](./THRESHOLD.html)** directly in your browser. Every interface, animation, script, visualization, and export tool is embedded in that single file. It does not require a server, network connection, account, CDN, or installation.
@@ -73,3 +75,23 @@ An in-progress session now opens with **RESUME / QUESTION NN** as its primary ac
 When device saving is off, work remains in the open tab only. A browser leave-warning is requested after an answer is entered, but this is not a backup and may not appear on mobile or forced app closure. Download a JSON or encrypted THX backup for durable portability.
 
 The existing reset dialog now offers **DOWNLOAD BACKUP** without clearing anything. Clearing only occurs through the separate existing reset action. Automated checks cover reload, legacy sessions, navigation, backup-before-reset, and complete erasure.
+
+## GitHub Pages PWA (web installation + offline use)
+
+**Hosted app:** https://westkitty.github.io/THRESHOLD/
+
+The source is still the original portable `THRESHOLD.html`. A deterministic build (`node tools/build-pages.mjs`) creates `dist/index.html` from it with the identical embedded questionnaire script, plus an installable PWA manifest, original app icons, optional install instructions, and a service worker. **Nothing has been removed from the standalone HTML edition.**
+
+**Install on iPhone:** open the hosted URL in **Safari**, tap **Share → Add to Home Screen**, enable **Open as Web App**, and tap **Add**. Visit once while online to let the offline app shell be cached. Later, launch it from the Home Screen even if connectivity is lost. No App Store or additional application download is required. If Apple's interface differs by iOS release, follow the visible Safari Add to Home Screen path.
+
+**Install on Android/desktop:** open the site in a compatible browser and choose **Install app** (or browser menu → **Add to Home screen**). The app exposes an optional install help control and honors browser-native install prompts. The web version also runs as an ordinary website without installation.
+
+**Offline behavior:** the service worker caches only a whitelist of blank application shell resources. While online, navigations use the network; while offline, they fall back to the cached app. No service worker cache contains participants' answers, notes, saved JSON, HTML dossiers, encrypted THX backups, or passphrases. The repository and published Pages files contain *only the blank application*, not user responses. GitHub Pages itself is public and may log visitor IP addresses for security; it is not private hosting.
+
+**Response storage:** SAVE ON DEVICE remains **off by default** and unencrypted when enabled. Files opened using `file://` and the Pages URL have different storage origins; there is **no automatic session migration or cross-device synchronization**. Transfer previous work by exporting JSON or encrypted THX in the old app, then using RESTORE RECORD in the hosted version. Export/share/print/encrypted backup are unchanged. Do not treat a Home Screen installation as a backup.
+
+**Updates:** each build derives the service-worker cache identifier from the published source. Old THRESHOLD-specific caches are removed on activation; new versions never forcibly reload an active questionnaire. Reopen the web app after an update to use its newest version. Always export an encrypted backup before switching browsers, reinstalling, or clearing Safari website data.
+
+**Publishing:** GitHub Actions builds and deploys `dist/` to Pages. It runs `node tests/verify.mjs`, `node tools/build-pages.mjs`, and `node tests/pwa.mjs`, then uploads only the generated application assets. GitHub Pages must use **GitHub Actions** as its source under repository Settings → Pages (rather than branch source). There is no Node.js or network dependency at end-user runtime.
+
+**Verification limits:** a successful static build and mocked offline service-worker tests do not establish hardware-specific iOS Safari support. Confirm installation, offline relaunch, browser export/share, and encrypted restore on a physical iPhone before describing device acceptance as fully tested.

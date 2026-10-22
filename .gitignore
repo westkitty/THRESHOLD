@@ -17,3 +17,6 @@ answers/
 
 # A completed HTML dossier contains participant answers
 THRESHOLD_dossier.html
+
+# Generated Pages publication assets (build output, never source)
+dist/
